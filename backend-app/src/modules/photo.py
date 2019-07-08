@@ -9,19 +9,19 @@ import time
 class Photo:
 
 ##############################################################################################
-    
+
     """
         Constructor class
-        
+
         Param file_path: Path where save photo files.
     """
-    
-    def __init__(self,file_path = "/home/jmv74211/Escritorio/"):
+
+    def __init__(self,file_path):
         self.file_path = file_path
         self.camera = PiCamera()
-        
+
 ##############################################################################################
-        
+
     """
         Returns a photo name with the current date
     """
@@ -40,12 +40,12 @@ class Photo:
         return file_name
 
 ##############################################################################################
-    
-    
+
+
     """
         It allows to modify the photo resolution or add a text inside it.
         Will be improved in next versions.
-        
+
         Param resolution: Resolution level. Default best.
         Param annotate_text: True for add text to the photo. Default false
     """
@@ -68,7 +68,7 @@ class Photo:
 
     """
         It allows to rotate the photo file.
-        
+
         Param grades: Number of rotation grades.
     """
     def rotate(self,grades):
@@ -78,7 +78,7 @@ class Photo:
 
     """
         It allows to capture a photo and save the file.
-        
+
         Param pauseTime: Time (in seconds) to prepare the camera before photo capturing.
                          Default 1 second.
     """
@@ -91,11 +91,11 @@ class Photo:
         print("Photo has been taken")
 
 ##############################################################################################
-    
+
     """
         It allows to liberate a camera resource.
     """
     def close(self):
         self.camera.close()
-        
+
 ##############################################################################################
