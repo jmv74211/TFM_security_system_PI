@@ -1,4 +1,4 @@
-from picamera import PiCamera, Color
+from picamera import PiCamera
 from time import sleep
 import time
 
@@ -7,23 +7,29 @@ import time
 """
 
 class Photo:
+    """ Constructor
 
-##############################################################################################
-
+    Parameters:
+        file_path (str): Path where save photo files.
+        resolution (str): Resolution level. [ULTRA, HIGH, MEDIUM, LOW]. (default is HIGH)
+        hflip (bool): Horizontal flip. (default is False)
+        vflip (bool): Vertical flip. (default is False)
     """
-        Constructor class
 
-        Param file_path: Path where save photo files.
-    """
-
-    def __init__(self,file_path):
+    def __init__(self, file_path, resolution="HIGH", hflip=False, vflip=False):
         self.file_path = file_path
         self.camera = PiCamera()
+        self.resolution = resolution
+        self.set_resolution(resolution)
+        self.hflip = hflip
+        self.vflip = vflip
 
-##############################################################################################
+    ##############################################################################################
 
     """
-        Returns a photo name with the current date
+  
+    Returns a photo name with the current date and time
+      
     """
 
     def get_file_name(self):
@@ -32,70 +38,137 @@ class Photo:
         day = time.strftime("%m")
 
         hour = time.strftime("%H")
-        minute= time.strftime("%M")
+        minute = time.strftime("%M")
         second = time.strftime("%S")
 
-        file_name = "IMG_{}{}{}_{}{}{}.jpg".format(year,month,day,hour,minute,second)
+        file_name = "IMG_{}{}{}_{}{}{}.jpg".format(year, month, day, hour, minute, second)
 
         return file_name
 
-##############################################################################################
+    ##############################################################################################
 
-
+    """ It allows to set the photo resolution.
+        
+    Parameters:
+        resolution (str): Resolution level. [LOW, MEDIUM, HIGH. ULTRA]. Default HIGHT .
     """
-        It allows to modify the photo resolution or add a text inside it.
-        Will be improved in next versions.
 
-        Param resolution: Resolution level. Default best.
-        Param annotate_text: True for add text to the photo. Default false
-    """
-    def set_configuration(self,resolution="best",annotate_text=False):
-        if resolution == "best":
-            # Ajustar a resolución máxima: Fotos 2592x1944, Vídeos 1920x1080
-            self.camera.resolution = (2592,1944)
+    def set_resolution(self, resolution="HIGH"):
+
+        # Resolution info: https://picamera.readthedocs.io/en/release-1.12/fov.html
+
+        if resolution == "ULTRA":
+            # MAX photo resolution: 2592x1944 and MAX Framerate 15
+            self.camera.resolution = (2592, 1944)
             self.camera.framerate = 15
-        else:
-            self.camera.resolution = (1728,1296)
-            self.camera.framerate = 15
+            self.resolution = "ULTRA"
+        elif resolution == "HIGH":
+            self.camera.resolution = (1920, 1080)
+            self.camera.framerate = 30
+            self.resolution = "HIGH"
+        elif resolution == "MEDIUM":
+            self.camera.resolution = (1280, 720)
+            self.camera.framerate = 40
+            self.resolution = "MEDIUM"
+        elif resolution == "LOW":
+            self.camera.resolution = (640, 480)
+            self.camera.framerate = 60
+            self.resolution = "LOW"
 
-        if annotate_text:
-            self.camera.annotate_text = get_file_name()
-            self.camera.annotate_text_size = 50
-            self.camera.annotate_background = Color('blue')
-            self.camera.annotate_foreground = Color('yellow')
+    ##############################################################################################
 
-##############################################################################################
+    """ It allows to rotate the photo file.
 
+    Parameters:
+        grades (int): number of degrees to rotate
     """
-        It allows to rotate the photo file.
 
-        Param grades: Number of rotation grades.
+    def rotate(self, degrees):
+        self.camera.rotation = degrees % 360
+
+    ##############################################################################################
+
+    """ It allows activate/deactivate vertical flip.
+
+    Parameters:
+        status (bool): Active or deactivated status. Default False.
     """
-    def rotate(self,grades):
-            self.camera.rotation = grades % 360
 
-##############################################################################################
+    def set_vflip(self, status=False):
+        self.vflip = status
 
+        if status:
+            self.camera.vflip = True
+
+    ##############################################################################################
+
+    """ It allows activate/deactivate horizontal flip.
+
+   Parameters:
+       status (bool): Active or deactivated status. Default False.
     """
-        It allows to capture a photo and save the file.
 
-        Param pauseTime: Time (in seconds) to prepare the camera before photo capturing.
-                         Default 1 second.
+    def set_hflip(self, status=False):
+        self.hflip = status
+
+        if status:
+            self.camera.hflip = True
+
+    ##############################################################################################
+
+    """ It allows to capture a photo and save the photo file.
+    
+    Parameters:
+        pauseTime(int): Time (in seconds) to prepare the camera before photo capturing. Default 1 second.
+        
+    Returns:
+        photo_name: Photo name that has been capturated
+    
     """
-    def take_photo(self,pauseTime=1):
+
+    def take_photo(self, pauseTime=1):
+        photo_name = self.file_path + "/" + self.get_file_name()
         self.camera.start_preview()
         sleep(pauseTime)
-        self.camera.capture(self.file_path+ "/" +self.get_file_name())
+        self.camera.capture(photo_name)
         self.camera.stop_preview()
-        self.camera.close()
         print("Photo has been taken")
 
-##############################################################################################
+        return photo_name
 
+    ##############################################################################################
+
+    """ It allows to capture a photo sequence and save the photo files.
+
+    Parameters:
+        num_images(int): Number of photo images to capture. Default 3.
+        
+    Returns:
+        basename: Basename of capturated photos
     """
-        It allows to liberate a camera resource.
+
+    def capture_sequence(self, num_images=3):
+        basename = self.file_path + "/" + self.get_file_name()
+        images_name = []
+
+        for i in range(num_images):
+            images_name.append(basename + "-" + repr(i+1))
+
+        self.camera.start_preview()
+        sleep(1)
+        self.camera.capture_sequence(images_name)
+        self.camera.stop_preview()
+        print("Photo sequence has been taken")
+
+        return basename
+
+    ##############################################################################################
+
+    """ It allows to free camera resources.
+    
     """
+
     def close(self):
         self.camera.close()
 
-##############################################################################################
+    ##############################################################################################
