@@ -1,9 +1,6 @@
 import unittest
-import sys
 import time
 import os
-
-sys.path.append('../../src')
 
 from modules.photo import Photo
 
