@@ -6,6 +6,7 @@ import time
     Class to administer the photo resource
 """
 
+
 class Photo:
     """ Constructor
 
@@ -80,11 +81,15 @@ class Photo:
     """ It allows to rotate the photo file.
 
     Parameters:
-        grades (int): number of degrees to rotate
+        degrees (int): number of degrees to rotate
     """
 
     def rotate(self, degrees):
-        self.camera.rotation = degrees % 360
+
+        degrees = degrees % 360
+
+        if degrees == 0 or degrees == 90 or degrees == 180 or degrees == 270:
+            self.camera.rotation = degrees
 
     ##############################################################################################
 
@@ -152,7 +157,7 @@ class Photo:
         images_name = []
 
         for i in range(num_images):
-            images_name.append(basename + "-" + repr(i+1))
+            images_name.append(basename + "-" + repr(i + 1))
 
         self.camera.start_preview()
         sleep(1)
