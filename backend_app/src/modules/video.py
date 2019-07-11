@@ -3,6 +3,7 @@ from picamera import Color
 import subprocess
 import time
 import datetime as dt
+from modules.logger import VideoLogger
 
 """
     Class to administer the video resource
@@ -29,6 +30,7 @@ class Video:
         self.set_resolution(resolution)
         self.hflip = hflip
         self.vflip = vflip
+        self.logger = VideoLogger()
 
     ##############################################################################################
 
@@ -143,22 +145,24 @@ class Video:
             self.camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
             self.camera.start_recording(video_name)
-            print("The recording has started")
+            self.logger.debug("The recording has started")
+            self.logger.info("A " + repr(record_time) + " seconds video is being recording")
             start = dt.datetime.now()
             while (dt.datetime.now() - start).seconds < record_time:
                 self.camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 self.camera.wait_recording(0.2)
             self.camera.stop_recording()
-            print("The recording has finished")
+            self.logger.debug("The recording has finished")
 
         else:
             self.camera.start_preview()
             self.camera.start_recording(video_name)
-            print("The recording has started")
+            self.logger.debug("The recording has started")
+            self.logger.info("A " + repr(record_time) + " seconds video is being recording")
             self.camera.wait_recording(record_time)
             self.camera.stop_recording()
             self.camera.stop_preview()
-            print("The recording has finished")
+            self.logger.debug("The recording has finished")
 
         # Convert from .h264 to .mp4
         if convert_video_to_mp4:
@@ -187,7 +191,6 @@ class Video:
 
         # Call delete video function
         self.delete_video(video_path)
-        print("Video has been converted to mp4")
 
         return video_name_converted
 
