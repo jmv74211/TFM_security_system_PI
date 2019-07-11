@@ -8,6 +8,7 @@ import datetime as dt
     Class to administer the video resource
 """
 
+
 class Video:
     """ Constructor
 
@@ -86,7 +87,11 @@ class Video:
     """
 
     def rotate(self, degrees):
-        self.camera.rotation = degrees % 360
+
+        degrees = degrees % 360
+
+        if degrees == 0 or degrees == 90 or degrees == 180 or degrees == 270:
+            self.camera.rotation = degrees
 
     ##############################################################################################
 
@@ -122,13 +127,18 @@ class Video:
 
     Parameters:
         record_time (int): Record time. (default is 10).
+        showDatetime (bool): Activate/deactivate datetime info in the video. (default is False).
+        convert_video_to_mp4 (bool): Activate/deactivate automatic conversion to mp4 format (default is True).
+        
+    Returns:
+        video_name: Video name that has been recorded and converted to mp4.
     """
 
-    def record_video(self, record_time=10):
+    def record_video(self, record_time=10, showDatetime=False, convert_video_to_mp4=True):
 
         video_name = self.file_path + "/" + self.get_file_name()
 
-        if self.showDatetime:
+        if showDatetime:
             self.camera.annotate_background = Color('black')
             self.camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -151,7 +161,10 @@ class Video:
             print("The recording has finished")
 
         # Convert from .h264 to .mp4
-        self.convert_video_to_mp4(video_name)
+        if convert_video_to_mp4:
+            video_name = self.convert_video_to_mp4(video_name)
+
+        return video_name
 
     ##############################################################################################
 
@@ -159,6 +172,9 @@ class Video:
 
     Parameters:
         video_path (str): Name of .h264 video path to convert.
+        
+    Return:
+        video_name_converted: Video name that has been converted to mp4
     """
 
     def convert_video_to_mp4(self, video_path):
@@ -172,6 +188,8 @@ class Video:
         # Call delete video function
         self.delete_video(video_path)
         print("Video has been converted to mp4")
+
+        return video_name_converted
 
     ##############################################################################################
 
