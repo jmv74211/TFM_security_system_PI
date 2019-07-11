@@ -1,6 +1,7 @@
 from picamera import PiCamera
 from time import sleep
 import time
+from modules.logger import PhotoLogger
 
 """
     Class to administer the photo resource
@@ -24,6 +25,7 @@ class Photo:
         self.set_resolution(resolution)
         self.hflip = hflip
         self.vflip = vflip
+        self.logger = PhotoLogger()
 
     ##############################################################################################
 
@@ -137,7 +139,8 @@ class Photo:
         sleep(pauseTime)
         self.camera.capture(photo_name)
         self.camera.stop_preview()
-        print("Photo has been taken")
+
+        self.logger.info("Photo has been taken")
 
         return photo_name
 
@@ -163,7 +166,8 @@ class Photo:
         sleep(1)
         self.camera.capture_sequence(images_name)
         self.camera.stop_preview()
-        print("Photo sequence has been taken")
+
+        self.logger.info("Photo sequence has been taken")
 
         return basename
 
