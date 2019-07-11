@@ -2,8 +2,10 @@ import logging
 import sys
 import yaml
 from abc import ABC, abstractmethod
+from settings import *
 
-configFile = "../config.yml"
+configFile = os.path.join(ROOT_DIR, 'config.yml')
+
 appFileLog = "security_system_PI_APP.log"
 
 class Logger(ABC):
@@ -11,9 +13,9 @@ class Logger(ABC):
     def __init__(self, loggerName):
 
         self.logger = logging.getLogger(loggerName)
-
+        self.logger.setLevel(logging.DEBUG)
         self.formatter = logging.Formatter(
-            '[%(levelname)s:%(asctime)s:%(module)s] %(message)s'
+            '[%(levelname)s:%(asctime)s] %(message)s'
         )
 
         with open(configFile, 'r') as ymlfile:
@@ -21,11 +23,11 @@ class Logger(ABC):
         self.logPath = cfg['logs']['path']
 
         self.streamHandler = logging.StreamHandler(sys.stdout)
-        self.streamHandler.setLevel(logging.WARNING)
+        self.streamHandler.setLevel(logging.DEBUG)
         self.streamHandler.setFormatter(self.formatter)
 
         self.fileModuleHandler = logging.FileHandler(self.logPath + "/" + loggerName + ".log")
-        self.fileModuleHandler.setLevel(logging.DEBUG)
+        self.fileModuleHandler.setLevel(logging.INFO)
         self.fileModuleHandler.setFormatter(self.formatter)
 
         self.fileAppHandler = logging.FileHandler(self.logPath + "/" + appFileLog)
@@ -79,6 +81,20 @@ class Logger(ABC):
     def setStreamHandler(self, newStreamHandler):
         if newStreamHandler != None:
             self.streamHandler = newStreamHandler
+
+    def getFileModuleHandler(self):
+        return self.fileModuleHandler
+
+    def setFileModuleandler(self, newFileModuleHandler):
+        if newFileModuleHandler != None:
+            self.fileModuleHandler = newFileModuleHandler
+
+    def getFileAppHandler(self):
+        return self.fileAppHandler
+
+    def setFileAppHandler(self, newFileAppHandler):
+        if newFileAppHandler != None:
+            self.fileAppHandler = newFileAppHandler
 
 
 class PhotoLogger(Logger):

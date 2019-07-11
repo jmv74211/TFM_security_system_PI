@@ -108,3 +108,6 @@ venv.bak/
 
 # Test production file
 prueba.py
+
+# Logs folder
+logs
