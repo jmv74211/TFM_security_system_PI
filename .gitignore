@@ -111,3 +111,7 @@ prueba.py
 
 # Logs folder
 logs
+
+# Coverage unnitest files
+.coverage
+htmlcov
