@@ -1,19 +1,14 @@
 import logging
 import sys
-import yaml
-from abc import ABC, abstractmethod
-from settings import *
+from abc import ABC
+import settings
 
 ##############################################################################################
-
-config_file = os.path.join(ROOT_DIR, 'config.yml')
 
 app_file_log = "security_system_PI_APP.log"
 app_file_log_error = "security_system_PI_APP_ERROR.log"
 
-with open(config_file, 'r') as ymlfile:
-    cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-config_log_path = cfg['logs']['path']
+config_log_path = settings.LOGS_FILE_PATH
 
 ##############################################################################################
 
