@@ -1,8 +1,0 @@
----
-
-logs:
-    # Filepath where save log files. Warning: end without /
-    path: /home/jmv74211/git/TFM_security_system_PI/backend_app/logs
-
-
-

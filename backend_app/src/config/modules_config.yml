@@ -1,0 +1,18 @@
+---
+
+photo:
+    resolution: "HIGH"
+    rotation: 90
+    vflip: False
+    hflip: False
+
+video:
+    resolution: "HIGH"
+    rotation: 0
+    vflip: False
+    hflip: False
+    showDatetime: False
+
+
+
+
