@@ -2,6 +2,7 @@ from picamera import PiCamera
 from time import sleep
 import time
 from modules.logger import PhotoLogger
+import settings
 
 """
     Class to administer the photo resource
@@ -18,7 +19,7 @@ class Photo:
         vflip (bool): Vertical flip. (default is False)
     """
 
-    def __init__(self, file_path, resolution="HIGH", hflip=False, vflip=False):
+    def __init__(self, file_path=settings.PHOTO_FILES_PATH, resolution="HIGH", hflip=False, vflip=False):
         self.file_path = file_path
         self.camera = PiCamera()
         self.resolution = resolution
@@ -38,7 +39,7 @@ class Photo:
     def get_file_name(self):
         year = time.strftime("%Y")
         month = time.strftime("%m")
-        day = time.strftime("%m")
+        day = time.strftime("%d")
 
         hour = time.strftime("%H")
         minute = time.strftime("%M")
