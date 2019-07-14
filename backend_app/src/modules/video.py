@@ -4,6 +4,7 @@ import subprocess
 import time
 import datetime as dt
 from modules.logger import VideoLogger
+import settings
 
 """
     Class to administer the video resource
@@ -21,7 +22,7 @@ class Video:
         vflip (bool): Vertical flip. (default is False)
     """
 
-    def __init__(self, file_path="/home/jmv74211/Escritorio/", showDatetime=False,
+    def __init__(self, file_path=settings.VIDEO_FILES_PATH, showDatetime=False,
                  resolution="HIGH", hflip=False, vflip=False):
         self.file_path = file_path
         self.camera = PiCamera()
@@ -43,7 +44,7 @@ class Video:
     def get_file_name(self):
         year = time.strftime("%Y")
         month = time.strftime("%m")
-        day = time.strftime("%m")
+        day = time.strftime("%d")
 
         hour = time.strftime("%H")
         minute = time.strftime("%M")
