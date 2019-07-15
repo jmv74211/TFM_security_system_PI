@@ -353,3 +353,14 @@ class VideoLogger(Logger):
         super().__init__(logger_name, log_path)
 
 ##############################################################################################
+
+"""
+    API agent logger
+"""
+
+class APIAgent(Logger):
+
+    def __init__(self, logger_name="APIAgent", log_path=config_log_path):
+        super().__init__(logger_name, log_path)
+
+##############################################################################################
