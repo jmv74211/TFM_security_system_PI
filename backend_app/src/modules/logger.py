@@ -327,6 +327,18 @@ class Logger(ABC):
         if new_file_app_error_handler != None:
             self.file_app_error_handler = new_file_app_error_handler
 
+    ##############################################################################################
+
+    """ It allows to add a new handler
+
+    Parameters:
+        new_handler (logging.fileHandler): New handler
+
+    """
+
+    def add_handler(self, new_handler):
+        if new_handler != None:
+            self.logger.addHandler(new_handler)
 
 ##############################################################################################
 
@@ -358,7 +370,7 @@ class VideoLogger(Logger):
     API agent logger
 """
 
-class APIAgent(Logger):
+class APIAgentLogger(Logger):
 
     def __init__(self, logger_name="APIAgent", log_path=config_log_path):
         super().__init__(logger_name, log_path)
