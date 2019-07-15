@@ -302,7 +302,7 @@ class TestLoggerModule(unittest.TestCase):
     ##############################################################################################
 
     def test8_API_agent_logging(self):
-        api_agent_logger = APIAgent(log_path=self.test_path)
+        api_agent_logger = APIAgentLogger(log_path=self.test_path)
 
         # Logs message
         info_message = "First test message"
