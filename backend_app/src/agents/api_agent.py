@@ -1,8 +1,11 @@
-from flask import Flask, request, jsonify  # Import to use web service
+from flask import Flask, request, jsonify, logging  # Import to use web service
 import yaml  # Import to read the configuration file information
 import settings  # Import setting info
 from modules.photo import Photo  # Import Photo module
 from modules.video import Video  # Import Video module
+from modules.logger import APIAgentLogger
+from modules.authentication import authenticate_user  # Import to user authentication
+from functools import wraps                    # Import to use decorators functions
 
 ##############################################################################################
 
@@ -13,10 +16,95 @@ from modules.video import Video  # Import Video module
 # Main instance app
 app = Flask(__name__)
 
+# *********************************************************************************************
+# ********************************** SUPPORT FUNCTIONS ****************************************
+# *********************************************************************************************
+
+""" Decorator function to access authentication
+
+Returns:
+    authentication_sucessfully (bool): True if authentication_sucessfully, False otherwhise      
+
+"""
+
+
+def authentication_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        data = request.get_json()
+
+        if data is not None and 'username' in data and 'password' in data:
+            if authenticate_user(data['username'], data['password']):
+                return f(*args, **kwargs)
+            else:
+                return jsonify({'message': 'Autentication is invalid!'}), 401
+        else:
+            return jsonify({'message': 'Autentication info is missing!'}), 401
+
+    return decorated
+
+
+##############################################################################################
+
+""" Read photo configuration data from modules config file
+
+Returns:
+    data (dict): Photo configuration data
+
+"""
+
+
+def read_photo_configuration(config_file_path = settings.CONFIG_FILE_MODULE_PATH):
+    with open(config_file_path, 'r') as ymlfile:
+        module_settings = yaml.load(ymlfile, Loader=yaml.FullLoader)
+
+    data = dict()
+
+    data['resolution'] = module_settings['photo']['resolution']
+    data['rotation'] = module_settings['photo']['rotation']
+    data['vflip'] = module_settings['photo']['vflip']
+    data['hflip'] = module_settings['photo']['hflip']
+
+    return data
+
+
+##############################################################################################
+
+""" Read video configuration data from modules config file
+
+Returns:
+    data (dict): Video configuration data
+
+"""
+
+
+def read_video_configuration(config_file_path = settings.CONFIG_FILE_MODULE_PATH):
+    with open(config_file_path, 'r') as ymlfile:
+        module_settings = yaml.load(ymlfile, Loader=yaml.FullLoader)
+
+    data = dict()
+
+    data['resolution'] = module_settings['video']['resolution']
+    data['rotation'] = module_settings['video']['rotation']
+    data['vflip'] = module_settings['video']['vflip']
+    data['hflip'] = module_settings['video']['hflip']
+    data['showDatetime'] = module_settings['video']['showDatetime']
+
+    return data
+
+
+##############################################################################################
+
+
+#*********************************************************************************************
+#********************************** API FUNCTIONS ****************************************
+#*********************************************************************************************
 
 ##############################################################################################
 
 @app.route("/api/take_photo", methods=['POST'])
+@authentication_required
 def take_photo():
     photo_config = read_photo_configuration()
 
@@ -34,6 +122,7 @@ def take_photo():
 ##############################################################################################
 
 @app.route("/api/record_video", methods=['POST'])
+@authentication_required
 def record_video():
     video_config = read_video_configuration()
 
@@ -65,37 +154,13 @@ def record_video():
 
 ##############################################################################################
 
-def read_photo_configuration():
-    with open(settings.CONFIG_FILE_MODULE_PATH, 'r') as ymlfile:
-        module_settings = yaml.load(ymlfile, Loader=yaml.FullLoader)
-
-    data = dict()
-
-    data['resolution'] = module_settings['photo']['resolution']
-    data['rotation'] = module_settings['photo']['rotation']
-    data['vflip'] = module_settings['photo']['vflip']
-    data['hflip'] = module_settings['photo']['hflip']
-
-    return data
-
-
-##############################################################################################
-
-def read_video_configuration():
-    with open(settings.CONFIG_FILE_MODULE_PATH, 'r') as ymlfile:
-        module_settings = yaml.load(ymlfile, Loader=yaml.FullLoader)
-
-    data = dict()
-
-    data['resolution'] = module_settings['video']['resolution']
-    data['rotation'] = module_settings['video']['rotation']
-    data['vflip'] = module_settings['video']['vflip']
-    data['hflip'] = module_settings['video']['hflip']
-    data['showDatetime'] = module_settings['video']['showDatetime']
-
-    return data
-
-##############################################################################################
-
 if __name__ == "__main__":
+    api_logger = APIAgentLogger()
+
+    # Add a api agent handler to flask logger.
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.DEBUG)
+    log.addHandler(api_logger.get_file_module_handler())
+    log.addHandler(api_logger.get_stream_handler())
+
     app.run(host="0.0.0.0", port=settings.API_AGENT_RUNNING_PORT, debug=settings.DEBUG)
