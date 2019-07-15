@@ -1,8 +1,7 @@
 import unittest
-import yaml
 import os
 import getpass  # Get username like whoami
-from settings import *
+import settings
 
 from modules.logger import *
 
@@ -18,7 +17,6 @@ class TestLoggerModule(unittest.TestCase):
         username = getpass.getuser()
         self.test_path = "/home/" + username
 
-        self.configFile = os.path.join(ROOT_DIR, 'config.yml')
         self.appFileLog = "security_system_PI_APP.log"
 
     ##############################################################################################
@@ -303,7 +301,109 @@ class TestLoggerModule(unittest.TestCase):
 
     ##############################################################################################
 
-    def test8_photo_logging(self):
+    def test8_API_agent_logging(self):
+        api_agent_logger = APIAgent(log_path=self.test_path)
+
+        # Logs message
+        info_message = "First test message"
+        warning_message = "Second test message"
+        error_message = "Third test message"
+        critical_message = "Fourth test message"
+
+        # Logs level
+        level_info = "INFO"
+        level_warning = "WARNING"
+        level_error = "ERROR"
+        level_critical = "CRITICAL"
+
+        # Make logs
+        api_agent_logger.info(info_message)
+        api_agent_logger.warning(warning_message)
+        api_agent_logger.error(error_message)
+        api_agent_logger.critical(critical_message)
+
+        # Path logs
+        api_agent_log_path = self.test_path + "/" + api_agent_logger.logger_name + ".log"
+        app_log_path = self.test_path + "/" + app_file_log
+        app_error_log_path = self.test_path + "/" + app_file_log_error
+
+        # Check if files exist
+        exist_api_agent_log = os.path.isfile(api_agent_log_path)
+        exist_app_log = os.path.isfile(app_log_path)
+        exist_app_error_log = os.path.isfile(app_error_log_path)
+
+        # Read files
+        f_1 = open(api_agent_log_path, "r")
+        api_agent_content = f_1.read()
+        f_1.close()
+
+        f_2 = open(app_log_path, "r")
+        app_log_content = f_2.read()
+        f_2.close()
+
+        f_3 = open(app_error_log_path, "r")
+        app_log_error_content = f_3.read()
+        f_3.close()
+
+        # Check if log files have the messages content
+
+        # info level
+        api_agent_log_has_message_info = info_message in api_agent_content and level_info in api_agent_content
+        app_log_has_message_info = info_message in app_log_content and level_info in app_log_content
+
+        # warning level
+        video_log_has_message_warning = warning_message in api_agent_content and level_warning in api_agent_content
+        app_log_has_message_warning = warning_message in app_log_content and level_warning in app_log_content
+
+        # level error. In this level it is necessary to check app_log_error file too
+        api_agent_log_has_message_error = error_message in api_agent_content and level_error in api_agent_content
+        app_log_has_message_error = error_message in app_log_content and level_error in app_log_content
+        app_log_error_has_message_error = error_message in app_log_error_content and level_error in app_log_error_content
+
+        # critical level. In this level it is necessary to check app_log_error file too
+        api_agent_log_has_message_critical = critical_message in api_agent_content and level_critical in api_agent_content
+        app_log_has_message_critical = critical_message in app_log_content and level_critical in app_log_content
+        app_log_error_has_message_critical = critical_message in app_log_error_content and level_critical in app_log_error_content
+
+        # Remove log files
+        os.remove(api_agent_log_path)
+        os.remove(app_log_path)
+        os.remove(app_error_log_path)
+
+        # Check test files logs after deleting
+        exist_api_agent_log_after_deleting = os.path.isfile(api_agent_log_path)
+        exist_app_log_after_deleting = os.path.isfile(app_log_path)
+        exist_app_error_log_after_deleting = os.path.isfile(app_error_log_path)
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertTrue(exist_api_agent_log)
+        self.assertTrue(exist_app_log)
+        self.assertTrue(exist_app_error_log)
+
+        self.assertTrue(api_agent_log_has_message_info)
+        self.assertTrue(app_log_has_message_info)
+
+        self.assertTrue(video_log_has_message_warning)
+        self.assertTrue(app_log_has_message_warning)
+
+        self.assertTrue(api_agent_log_has_message_error)
+        self.assertTrue(app_log_has_message_error)
+        self.assertTrue(app_log_error_has_message_error)
+
+        self.assertTrue(api_agent_log_has_message_critical)
+        self.assertTrue(app_log_has_message_critical)
+        self.assertTrue(app_log_error_has_message_critical)
+
+        self.assertFalse(exist_api_agent_log_after_deleting)
+        self.assertFalse(exist_app_log_after_deleting)
+        self.assertFalse(exist_app_error_log_after_deleting)
+
+    ##############################################################################################
+
+    def test9_photo_logging(self):
         # Logs message
         info_message = "First test message"
         warning_message = "Second test message"
