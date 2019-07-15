@@ -1,0 +1,7 @@
+---
+
+authentication:
+    user: user
+    password: sha256$tazHE31s$b4b54292237636e798e407dc935651f9af64a25bd2c0a896aa64c90361699100
+
+

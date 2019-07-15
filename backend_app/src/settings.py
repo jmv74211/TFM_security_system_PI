@@ -26,6 +26,9 @@ VIDEO_FILES_PATH =  "/home/jmv74211/Escritorio/security_files/videos"
 # Module configuration file
 CONFIG_FILE_MODULE_PATH = os.path.join(ROOT_DIR, 'config','modules_config.yml')
 
+# Credentials file
+CONFIG_FILE_AUTHENTICATION =  os.path.join(ROOT_DIR, 'config','authentication.yml')
+
 
 
 

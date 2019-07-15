@@ -2,7 +2,7 @@
 
 photo:
     resolution: "HIGH"
-    rotation: 90
+    rotation: 0
     vflip: False
     hflip: False
 
