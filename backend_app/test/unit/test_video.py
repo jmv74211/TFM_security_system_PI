@@ -1,6 +1,8 @@
 import unittest
 import time
 import os
+import getpass  # Get username like whoami
+
 
 from modules.video import Video
 
@@ -13,12 +15,13 @@ class TestVideoModule(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.file_path = "/home/jmv74211"
+        username = getpass.getuser()
+        self.test_path = "/home/" + username
 
     ##############################################################################################
 
     def setUp(self):
-        self.camera_video = Video(file_path=self.file_path)
+        self.camera_video = Video(file_path=self.test_path)
 
     ##############################################################################################
 
@@ -31,7 +34,7 @@ class TestVideoModule(unittest.TestCase):
         # Calculates the current date and time
         year = time.strftime("%Y")
         month = time.strftime("%m")
-        day = time.strftime("%m")
+        day = time.strftime("%d")
 
         hour = time.strftime("%H")
         minute = time.strftime("%M")
@@ -66,7 +69,7 @@ class TestVideoModule(unittest.TestCase):
         #                                     CHECKS                                              #
         # ----------------------------------------------------------------------------------------#
 
-        self.assertEqual(current_file_path, self.file_path)
+        self.assertEqual(current_file_path, self.test_path)
         self.assertEqual(new_file_path, modified_file_path)
         self.assertEqual(path, self.camera_video.file_path)
 
