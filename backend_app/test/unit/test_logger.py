@@ -34,7 +34,7 @@ class TestLoggerModule(unittest.TestCase):
         # ----------------------------------------------------------------------------------------#
 
         self.assertIsNotNone(self.logger)
-        self.assertEqual(logger_name, "photoModule")
+        self.assertEqual(logger_name, "photo_module")
 
     ##############################################################################################
 
@@ -47,7 +47,7 @@ class TestLoggerModule(unittest.TestCase):
         # ----------------------------------------------------------------------------------------#
 
         self.assertIsNotNone(logger)
-        self.assertEqual(logger_name, "videoModule")
+        self.assertEqual(logger_name, "video_module")
 
     ##############################################################################################
 
