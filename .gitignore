@@ -115,3 +115,6 @@ logs
 # Coverage unnitest files
 .coverage
 htmlcov
+
+# Celery database
+*.sqlite
