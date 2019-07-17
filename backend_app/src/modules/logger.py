@@ -349,7 +349,7 @@ class Logger(ABC):
 
 class PhotoLogger(Logger):
 
-    def __init__(self, logger_name="photoModule", log_path=config_log_path):
+    def __init__(self, logger_name="photo_module", log_path=config_log_path):
         super().__init__(logger_name, log_path)
 
 
@@ -361,7 +361,7 @@ class PhotoLogger(Logger):
 
 class VideoLogger(Logger):
 
-    def __init__(self, logger_name="videoModule", log_path=config_log_path):
+    def __init__(self, logger_name="video_module", log_path=config_log_path):
         super().__init__(logger_name, log_path)
 
 ##############################################################################################
@@ -372,7 +372,18 @@ class VideoLogger(Logger):
 
 class APIAgentLogger(Logger):
 
-    def __init__(self, logger_name="APIAgent", log_path=config_log_path):
+    def __init__(self, logger_name="API_agent", log_path=config_log_path):
+        super().__init__(logger_name, log_path)
+
+##############################################################################################
+
+"""
+    Motion agent logger
+"""
+
+class MotionAgentLogger(Logger):
+
+    def __init__(self, logger_name="motion_agent", log_path=config_log_path):
         super().__init__(logger_name, log_path)
 
 ##############################################################################################
