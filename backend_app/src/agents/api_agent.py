@@ -6,7 +6,11 @@ from modules.video import Video  # Import Video module
 from modules.logger import APIAgentLogger
 from modules.authentication import authenticate_user  # Import to user authentication
 from functools import wraps  # Import to use decorators functions
-from lib.flask_celery import make_celery #
+from lib.flask_celery import make_celery  #
+import os
+import signal
+import subprocess  # Import to create a synchronous processes
+import json
 
 ##############################################################################################
 
@@ -39,21 +43,29 @@ Returns:
 
 """
 
+
 def authentication_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
 
-        data = request.get_json()
-
-        if data is not None and 'user' in data and 'password' in data:
-            if authenticate_user(data['user'], data['password']):
-                return f(*args, **kwargs)
+        try:
+            data = json.loads(request.data.decode('utf-8'),
+                              strict=False)  # strict = False allow for escaped chardata = request.get_json()
+            if data is not None and 'user' in data and 'password' in data:
+                if authenticate_user(data['user'], data['password']):
+                    return f(*args, **kwargs)
+                # User or password invalid
+                else:
+                    return jsonify({'message': 'Autentication is invalid'}), 401
+            # User or password info missing
             else:
-                return jsonify({'message': 'Autentication is invalid!'}), 401
-        else:
-            return jsonify({'message': 'Autentication info is missing!'}), 401
+                return jsonify({'message': 'Autentication info is missing'}), 401
+        # Missing data
+        except:
+            return jsonify({'message': 'Autentication info is missing'}), 401
 
     return decorated
+
 
 ##############################################################################################
 
@@ -97,14 +109,16 @@ Returns the status and identifier of the task
 @app.route("/api/record_video", methods=['POST'])
 @authentication_required
 def record_video_api():
-    task = record_video.delay(request.get_json())
+    data = request.get_json()
 
-    if request is not None and 'recordtime' in request and request['recordtime'] > 0:
-        record_time = request['recordtime']
+    if data is not None and 'recordtime' in data and data['recordtime'] > 0:
+        record_time = data['recordtime']
     else:
         record_time = 10
 
-    response = {'status': 'A ' + record_time + ' seconds video request has been sent', 'task_id': task.id}
+    task = record_video.delay(record_time)
+
+    response = {'status': 'A ' + repr(record_time) + ' seconds video request has been sent', 'task_id': task.id}
 
     return jsonify(response)
 
@@ -113,15 +127,37 @@ def record_video_api():
 
 """ Gets task status
 
-Returns the task status ['PENDING','STARTED','FAILURE','REVOKED','SUCCESS']
+Returns the task status ['PENDING','STARTED','FAILURE',RETRY,'REVOKED','SUCCESS']
 
 """
 
 
 @app.route("/api/check/<task_id>", methods=['GET'])
-def check_api(task_id):
+@authentication_required
+def check_task_status(task_id):
     task = celery.AsyncResult(task_id)
     response = {'status': task.state}
+
+    return jsonify(response)
+
+
+##############################################################################################
+
+""" Gets task result
+
+Returns: 
+"""
+
+
+@app.route("/api/result/<task_id>", methods=['GET'])
+@authentication_required
+def get_task_result(task_id):
+    task = celery.AsyncResult(task_id)
+
+    if task.ready():
+        response = {'ready': True, 'status': task.state, 'result': task.get()}
+    else:
+        response = {'ready': False, 'status': task.state}
 
     return jsonify(response)
 
@@ -137,6 +173,7 @@ Returns the request status
 
 
 @app.route("/api/stop/<task_id>", methods=['POST'])
+@authentication_required
 def stop_task_api(task_id):
     task = celery.AsyncResult(task_id)
     print(task.state)
@@ -153,13 +190,84 @@ def stop_task_api(task_id):
 ##############################################################################################
 
 
+"""
+    Function to activate the motion agent.
+"""
+
+
+@app.route("/api/motion_agent/activate", methods=['POST'])
+@authentication_required
+def activate_motion_agent():
+    if not check_status_motion_agent():
+
+        motion_agent_mode = "photo"
+        data = request.get_json()
+        if data is not None and 'mode' in data:
+            if data['mode'] == "video":
+                motion_agent_mode = "video"
+
+        # Make a subprocess and redirect stdout
+        subprocess.Popen(['python3', settings.MOTION_AGENT_PATH, motion_agent_mode], stdout=subprocess.PIPE)
+
+        print("The motion agent in " + motion_agent_mode + " mode has been activated")
+        return jsonify({'status': 'The motion agent in ' + motion_agent_mode + ' mode has been activated sucessfully'})
+    else:
+        return jsonify({'status': 'The motion agent was already activated'})
+
+
+##############################################################################################
+
+
+"""
+    Function to deactivate the motion agent.
+"""
+
+
+@app.route("/api/motion_agent/deactivate", methods=['POST'])
+@authentication_required
+def deactivate_motion_agent():
+    if check_status_motion_agent():
+        process = os.popen('pgrep -a python | grep "motion_agent" | cut -d " " -f 1')
+        pid_process = int(process.read())
+        os.kill(pid_process, signal.SIGKILL)
+        process.close()
+
+        print("The motion has been deactivated")
+        return jsonify({'status': 'The motion agent has been deactivated sucessfully'})
+
+    else:
+        return jsonify({'status': 'The agent was already deactivated!'})
+
+
+##############################################################################################
+
+
+"""
+    Function to check the motion agent status.
+"""
+
+
+@app.route("/api/motion_agent/check_status", methods=['GET'])
+@authentication_required
+def check_motion_agent_status():
+    if check_status_motion_agent():
+        return jsonify({'status': 'ON'})
+
+    else:
+        return jsonify({'status': 'OFF'})
+
+
+##############################################################################################
+
+
 """ Generates a motion alert
 
 Returns the request status
 
 """
 
-@app.route("/api/generate_motion_agent_alert", methods=['POST'])
+
+@app.route("/api/motion_agent/generate_alert", methods=['POST'])
 @authentication_required
 def generate_motion_alert():
     global motion_agent_alert
@@ -186,17 +294,19 @@ Returns True/False. If true, a file_path_alert is added.
 
 """
 
-@app.route("/api/check_motion_agent_alert", methods=['GET'])
+
+@app.route("/api/motion_agent/check_alert", methods=['GET'])
 @authentication_required
 def check_motion_agent_alert():
     global motion_agent_alert
-    print("alert vale {}".format(motion_agent_alert))
+
     if motion_agent_alert == 1:
         global file_path_alert
         motion_agent_alert = 0
         return jsonify({'alert': True, 'file_path': file_path_alert})
     else:
         return jsonify({'alert': False})
+
 
 ##############################################################################################
 
@@ -256,55 +366,74 @@ def read_video_configuration(config_file_path=settings.CONFIG_FILE_MODULE_PATH):
 
 ##############################################################################################
 
-""" Asynchronous task to take a photo
-
+""" 
+    Asynchronous task to take a photo
 """
 
 
 @celery.task(name="api_take_photo")
-def take_photo():
+def take_photo(photo_path=settings.PHOTO_FILES_PATH):
     photo_config = read_photo_configuration()
 
-    camera_photo = Photo(file_path=settings.PHOTO_FILES_PATH, resolution=photo_config['resolution'],
+    camera_photo = Photo(file_path=photo_path, resolution=photo_config['resolution'],
                          vflip=photo_config['vflip'], hflip=photo_config['hflip'])
     camera_photo.rotate(photo_config['rotation'])
-    camera_photo.take_photo()
+    photo_file_path = camera_photo.take_photo()
     camera_photo.close()
+
+    return photo_file_path
 
 
 ##############################################################################################
 
-""" Asynchronous task to record a video
-
+""" 
+    Asynchronous task to record a video
 """
 
 
 @celery.task(name="api_record_video")
-def record_video(request_data):
+def record_video(record_time, video_path=settings.VIDEO_FILES_PATH):
     video_config = read_video_configuration()
 
-    video_camera = Video(file_path=settings.VIDEO_FILES_PATH, showDatetime=video_config['showDatetime'],
+    video_camera = Video(file_path=video_path, showDatetime=video_config['showDatetime'],
                          resolution=video_config['resolution'], vflip=video_config['vflip'],
                          hflip=video_config['hflip'])
 
     video_camera.rotate(video_config['rotation'])
 
-    # If recordtime is specified in the data request
-    if request_data is not None and 'recordtime' in request_data and request_data['recordtime'] > 0:
-        record_time = request_data['recordtime']
+    # Record max long is 1 hour
+    if record_time > 3600:
+        record_time = 3600
+    elif record_time < 0:
+        record_time = 5
 
-        # Record max long is 1 hour
-        if record_time > 3600:
-            record_time = 3600
-        elif record_time < 0:
-            record_time = 5
-
-        video_camera.record_video(record_time)
-    # If recordtime is not specified, the default recordtime is 10 seconds.
-    else:
-        video_camera.record_video()
+    video_file_path = video_camera.record_video(record_time)
 
     video_camera.close()
+
+    return video_file_path
+
+
+##############################################################################################
+
+"""
+    Function to check the motion agent status. True if is running, False otherwise
+"""
+
+
+def check_status_motion_agent():
+    process = os.popen('pgrep -a python | grep "motion_agent" | cut -d " " -f1')
+    pid_process = process.read()
+    process.close()
+
+    if (pid_process == ""):
+        return False
+    else:
+        return True
+
+
+##############################################################################################
+
 
 ##############################################################################################
 
