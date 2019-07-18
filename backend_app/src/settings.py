@@ -50,6 +50,9 @@ GPIO_SENSOR_PIN_NUMBER = 16
 # Time to wait until check movement sensor status
 REFRESH_TIME = 5
 
+MOTION_AGENT_PATH = "/home/jmv74211/git/TFM_security_system_PI/backend_app/src/agents/motion_agent.py"
+
+
 
 
 
