@@ -58,7 +58,7 @@ while True:
 
     sleep(activate_time)
     if GPIO.input(pin_number):
-        logger.debug("ALERT FROM MOTION AGENT")
+        logger.info("ALERT FROM MOTION AGENT")
 
         if motion_agent_mode == "photo":
             photo_config = read_photo_configuration()
@@ -81,10 +81,11 @@ while True:
 
         payload = {'user': user, 'password': password, 'file_path': file_path}
         headers = {'content-type': 'application/json'}
+
         try:
-            motion_agent_request = requests.post(main_agent_host + "/api/generate_motion_agent_alert", json=payload,
+            motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/generate_alert", json=payload,
                                                  headers=headers)
         except:
-            logger.error("Error while trying to send an alerto to API agent with address {}.¿It is running?".format(
+            logger.error("Error while trying to send an alert to API agent with address {}.¿It is running?".format(
                 main_agent_host))
         sleep(settings.REFRESH_TIME)
