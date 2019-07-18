@@ -19,6 +19,8 @@ class Photo:
         vflip (bool): Vertical flip. (default is False)
     """
 
+    logger = PhotoLogger()
+
     def __init__(self, file_path=settings.PHOTO_FILES_PATH, resolution="HIGH", hflip=False, vflip=False):
         self.file_path = file_path
         self.camera = PiCamera()
@@ -26,7 +28,6 @@ class Photo:
         self.set_resolution(resolution)
         self.hflip = hflip
         self.vflip = vflip
-        self.logger = PhotoLogger()
 
     ##############################################################################################
 
@@ -141,7 +142,7 @@ class Photo:
         self.camera.capture(photo_name)
         self.camera.stop_preview()
 
-        self.logger.info("Photo has been taken")
+        Photo.logger.info("Photo has been taken")
 
         return photo_name
 
@@ -168,7 +169,7 @@ class Photo:
         self.camera.capture_sequence(images_name)
         self.camera.stop_preview()
 
-        self.logger.info("Photo sequence has been taken")
+        Photo.logger.info("Photo has been taken")
 
         return basename
 
