@@ -156,4 +156,34 @@ class TestAPIAgentModule(unittest.TestCase):
         self.assertTrue(exist_video)
         self.assertFalse(exist_video_after_deleting)
 
-        ##############################################################################################
+    ##############################################################################################
+
+    def test_5_check_status_ma(self): # Cant name it with *motion_agent because os.kill will kill it by its name
+
+        # Check initial state
+        initial_state = check_status_motion_agent()
+
+        # Activates motion agent
+        subprocess.Popen(['python3', settings.MOTION_AGENT_PATH], stdout=subprocess.PIPE)
+
+        # Check new state
+        second_state = check_status_motion_agent()
+
+        # Deactivates motion agent
+        process = os.popen('pgrep -a python | grep "motion_agent" | cut -d " " -f 1')
+        pid_process = int(process.read())
+        os.kill(pid_process, signal.SIGKILL)
+        process.close()
+
+        # Check new state
+        third_state = check_status_motion_agent()
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertFalse(initial_state)
+        self.assertTrue(second_state)
+        self.assertFalse(third_state)
+
+##############################################################################################
