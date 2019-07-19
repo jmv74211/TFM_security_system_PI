@@ -23,6 +23,7 @@ from ws4py.server.wsgiutils import WebSocketWSGIApplication
 
 ###########################################
 # CONFIGURATION
+
 WIDTH = 1024
 HEIGHT = 768
 FRAMERATE = 24

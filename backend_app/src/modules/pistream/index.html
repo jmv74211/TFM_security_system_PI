@@ -1,46 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-	<meta name="viewport" content="width=${WIDTH}, initial-scale=1"/>
-	<title>jsmpeg streaming</title>
-	<style type="text/css">
-		body {
-			background: ${BGCOLOR};
-			text-align: center;
-			margin-top: 1%;
-		}
-		#videoCanvas {
-			/* Always stretch the canvas to 640x480, regardless of its
-			internal size. */
-			width: ${WIDTH}px;
-			height: ${HEIGHT}px;
-		}
-	</style>
-</head>
-<body>
-	<!-- The Canvas size specified here is the "initial" internal resolution. jsmpeg will
-		change this internal resolution to whatever the source provides. The size the
-		canvas is displayed on the website is dictated by the CSS style.
-	-->
-	<canvas id="videoCanvas" width="${WIDTH}" height="${HEIGHT}">
-		<p>
-			Please use a browser that supports the Canvas Element, like
-			<a href="http://www.google.com/chrome">Chrome</a>,
-			<a href="http://www.mozilla.com/firefox/">Firefox</a>,
-			<a href="http://www.apple.com/safari/">Safari</a> or Internet Explorer 10
-		</p>
-	</canvas>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+		<title>Security system PI</title>
+
+		<style>
+			.cwhite {
+				color: white;
+			}
+
+			body {
+				background-color: #333
+			}
+
+			.canvas {
+				width: 100%;
+				height:80%;
+			}
+
+			#datetime {
+				color: white;
+				font-size: large;
+				text-align:center
+			}
+
+		</style>
+	</head>
+
+	<body onload="startTime()">
+
+	<div class="container">
+		<div class="row">
+			<div class="col-12 mt-5 p-3">
+				<canvas id="videoCanvas" class="canvas">
+					<p>
+					Please use a browser that supports the Canvas Element, like
+					<a href="http://www.google.com/chrome">Chrome</a>,
+					<a href="http://www.mozilla.com/firefox/">Firefox</a>,
+					<a href="http://www.apple.com/safari/">Safari</a> or Internet Explorer 10
+					</p>
+				</canvas>
+				<p id="datetime" class="mt-2"></p>
+			</div>
+
+		</div>
+	</div>
+
+
 	<script type="text/javascript" src="jsmpg.js"></script>
 	<script type="text/javascript">
 		// Show loading notice
 		var canvas = document.getElementById('videoCanvas');
 		var ctx = canvas.getContext('2d');
-		ctx.fillStyle = '${COLOR}';
+		//ctx.fillStyle = '${COLOR}';
 		ctx.fillText('Loading...', canvas.width/2-30, canvas.height/3);
 
 		// Setup the WebSocket connection and start the player
 		var client = new WebSocket('ws://' + window.location.hostname + ':${WS_PORT}/');
 		var player = new jsmpeg(client, {canvas:canvas});
 	</script>
-</body>
+
+	<script>
+		function startTime() {
+			var today = new Date();
+			var date = today.getFullYear()+'-'+(checkTime(today.getMonth()+1))+'-'+checkTime(today.getDate());
+			var time = checkTime(today.getHours()) + ":" + checkTime(today.getMinutes()) + ":" + checkTime(today.getSeconds());
+			var dateTime = date+' '+time;
+			document.getElementById('datetime').innerHTML = dateTime
+			var t = setTimeout(startTime, 500);
+
+			function checkTime(i) {
+				if (i < 10) {
+					i = "0" + i;  // add zero in front of numbers < 10
+				}
+				return i;
+			}
+		}
+	</script>
+
+	</body>
 </html>
