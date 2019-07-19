@@ -140,6 +140,9 @@ class TestLoggerModule(unittest.TestCase):
         #                                     CHECKS                                              #
         # ----------------------------------------------------------------------------------------#
 
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
+
         self.assertEqual(task_status, 'SUCCESS')
         self.assertTrue(exist_image)
         self.assertFalse(exist_image_after_deleting)
@@ -195,6 +198,9 @@ class TestLoggerModule(unittest.TestCase):
         # ----------------------------------------------------------------------------------------#
         #                                     CHECKS                                              #
         # ----------------------------------------------------------------------------------------#
+
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
 
         self.assertEqual(task_status, 'SUCCESS')
         self.assertTrue(exist_video)
@@ -254,6 +260,11 @@ class TestLoggerModule(unittest.TestCase):
         #                                     CHECKS                                              #
         # ----------------------------------------------------------------------------------------#
 
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
+        self.assertEqual(req_3.status_code, 200)
+        self.assertEqual(req_4.status_code, 200)
+
         self.assertEqual(req_2_status, 'STARTED')
         self.assertEqual(req_3_status, 'SUCCESS')
         self.assertEqual(req_4_status, 'SUCCESS')
@@ -306,6 +317,10 @@ class TestLoggerModule(unittest.TestCase):
         # ----------------------------------------------------------------------------------------#
         #                                     CHECKS                                              #
         # ----------------------------------------------------------------------------------------#
+
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
+        self.assertEqual(req_3.status_code, 200)
 
         self.assertEqual(req_2_status, 'STARTED')
         self.assertFalse(req_2_ready)
@@ -368,81 +383,214 @@ class TestLoggerModule(unittest.TestCase):
         #                                     CHECKS                                              #
         # ----------------------------------------------------------------------------------------#
 
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
+        self.assertEqual(req_3.status_code, 200)
+        self.assertEqual(req_4.status_code, 200)
+
         self.assertEqual(req_2_status, 'STARTED')
         self.assertTrue(stop_task_success)
         self.assertEqual(req_4_status, 'REVOKED')
 
     ##############################################################################################
 
-    # def test8_activate_deactivate_motion_agent(self):
-    #     url_base = settings.API_AGENT_IP_ADDRESS + ":" + repr(settings.API_AGENT_RUNNING_PORT)
-    #     url_activate = url_base + "/api/motion_agent/activate"
-    #     url_deactivate = url_base + "/api/motion_agent/deactivate"
-    #
-    #     # Response check messages
-    #     activate_photo_mode_message = 'The motion agent in photo mode has been activated sucessfully'
-    #     activate_video_mode_message = 'The motion agent in video mode has been activated sucessfully'
-    #     already_activated_message = 'The motion agent was already activated'
-    #     deactivate_api_message = 'The motion agent has been deactivated sucessfully'
-    #     already_deactivated_api_message = 'The motion agent has been deactivated sucessfully'
-    #
-    #     # Send an activate request
-    #     req = requests.post(url_activate, data=self.auth_data, headers=self.headers)
-    #     activate_response = req.json()
-    #     activate_message = activate_response['status']
-    #
-    #     time.sleep(1)
-    #
-    #     # Send again an activate request
-    #     req_2 = requests.post(url_activate, data=self.auth_data, headers=self.headers)
-    #     activate_response_2 = req_2.json()
-    #     activate_message_2 = activate_response_2['status']
-    #
-    #     time.sleep(1)
-    #
-    #     # Send a deactivate request
-    #     req_3 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
-    #     deactivate_response = req_3.json()
-    #     deactivate_message = deactivate_response['status']
-    #
-    #     time.sleep(1)
-    #
-    #     # Send again a deactivate request
-    #     req_4 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
-    #     deactivate_response_2 = req_4.json()
-    #     deactivate_message_2 = deactivate_response_2['status']
-    #
-    #     time.sleep(1)
-    #
-    #     # Send an activate request in video mode
-    #     payload = json.dumps({"user": self.user, "password": self.password, "mode": "video"})
-    #     req_5 = requests.post(url_activate, data=payload, headers=self.headers)
-    #     activate_response_3 = req_5.json()
-    #     activate_message_3 = activate_response_3['status']
-    #
-    #     time.sleep(1)
-    #
-    #     # Send a deactivate request in video mode
-    #     req_6 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
-    #     deactivate_response_3 = req_6.json()
-    #     deactivate_message_3 = deactivate_response_3['status']
-    #
-    #     # ----------------------------------------------------------------------------------------#
-    #     #                                     CHECKS                                              #
-    #     # ----------------------------------------------------------------------------------------#
-    #
-    #     # Activate default mode (photo)
-    #     self.assertEqual(activate_message, activate_photo_mode_message)
-    #     self.assertEqual(activate_message_2, already_activated_message)
-    #
-    #     # Deactivate
-    #     self.assertEqual(deactivate_message, deactivate_api_message)
-    #     self.assertEqual(deactivate_message_2, already_deactivated_api_message)
-    #
-    #     # Activate video mode
-    #     self.assertEqual(activate_message_3, activate_video_mode_message)
-    #
-    #     # Deactivate video mode
-    #     self.assertEqual(deactivate_message_3, deactivate_api_message)
+    # activate/deactivate motion agent
+    def test8_activate_and_deactivate_ma(self):  # Cant name it with *motion_agent because os.kill will kill it by its name
+        url_base = settings.API_AGENT_IP_ADDRESS + ":" + repr(settings.API_AGENT_RUNNING_PORT)
+        url_activate = url_base + "/api/motion_agent/activate"
+        url_deactivate = url_base + "/api/motion_agent/deactivate"
+
+        # Response check messages
+        activate_photo_mode_message = 'The motion agent in photo mode has been activated sucessfully'
+        activate_video_mode_message = 'The motion agent in video mode has been activated sucessfully'
+        already_activated_message = 'The motion agent was already activated'
+        deactivate_api_message = 'The motion agent has been deactivated sucessfully'
+        already_deactivated_api_message = 'The motion agent was already deactivated'
+
+        # Send an activate request
+        req = requests.post(url_activate, data=self.auth_data, headers=self.headers)
+        activate_response = req.json()
+        activate_message = activate_response['status']
+
+        time.sleep(0.3)
+
+        # Send again an activate request
+        req_2 = requests.post(url_activate, data=self.auth_data, headers=self.headers)
+        activate_response_2 = req_2.json()
+        activate_message_2 = activate_response_2['status']
+
+        time.sleep(0.3)
+
+        # Send a deactivate request
+        req_3 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
+        deactivate_response = req_3.json()
+        deactivate_message = deactivate_response['status']
+
+        time.sleep(0.3)
+
+        # Send again a deactivate request
+        req_4 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
+        deactivate_response_2 = req_4.json()
+        deactivate_message_2 = deactivate_response_2['status']
+
+        time.sleep(0.3)
+
+        # Send an activate request in video mode
+        payload = json.dumps({"user": self.user, "password": self.password, "mode": "video"})
+        req_5 = requests.post(url_activate, data=payload, headers=self.headers)
+        activate_response_3 = req_5.json()
+        activate_message_3 = activate_response_3['status']
+
+        time.sleep(0.3)
+
+        # Send a deactivate request in video mode
+        req_6 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
+        deactivate_response_3 = req_6.json()
+        deactivate_message_3 = deactivate_response_3['status']
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
+        self.assertEqual(req_3.status_code, 200)
+        self.assertEqual(req_4.status_code, 200)
+        self.assertEqual(req_4.status_code, 200)
+        self.assertEqual(req_5.status_code, 200)
+        self.assertEqual(req_5.status_code, 200)
+
+        # Activate default mode (photo)
+        self.assertEqual(activate_message, activate_photo_mode_message)
+        self.assertEqual(activate_message_2, already_activated_message)
+
+        # Deactivate
+        self.assertEqual(deactivate_message, deactivate_api_message)
+        self.assertEqual(deactivate_message_2, already_deactivated_api_message)
+
+        # Deactivate video mode
+        self.assertEqual(deactivate_message_3, deactivate_api_message)
+
+        # Activate video mode
+        self.assertEqual(activate_message_3, activate_video_mode_message)
 
     ##############################################################################################
+
+    # check_motion_agent_status()
+    def test9_check_status_ma(self):  # Cant name it with *motion_agent because os.kill will kill it by its name
+        url_base = settings.API_AGENT_IP_ADDRESS + ":" + repr(settings.API_AGENT_RUNNING_PORT)
+        url_activate = url_base + "/api/motion_agent/activate"
+        url_deactivate = url_base + "/api/motion_agent/deactivate"
+        url_check = url_base + "/api/motion_agent/check_status"
+
+        # Send check request
+        req = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_response = req.json()
+        check_message = check_response['status']
+
+        time.sleep(0.3)
+
+        # Send an activate request
+        req_2 = requests.post(url_activate, data=self.auth_data, headers=self.headers)
+        time.sleep(0.3)
+
+        # Send check request
+        req_3 = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_response_2 = req_3.json()
+        check_message_2 = check_response_2['status']
+
+        time.sleep(0.3)
+
+        # Send a deactivate request
+        req_4 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
+
+        time.sleep(0.3)
+
+        # Send check request
+        req_5 = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_response_3 = req_5.json()
+        check_message_3 = check_response_3['status']
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
+        self.assertEqual(req_3.status_code, 200)
+        self.assertEqual(req_4.status_code, 200)
+        self.assertEqual(req_5.status_code, 200)
+
+        self.assertEqual(check_message, 'OFF')
+        self.assertEqual(check_message_2, 'ON')
+        self.assertEqual(check_message_3, 'OFF')
+
+    ##############################################################################################
+
+    def test10_generate_and_check_motion_alert(self):
+        url_base = settings.API_AGENT_IP_ADDRESS + ":" + repr(settings.API_AGENT_RUNNING_PORT)
+        url_generate = url_base + "/api/motion_agent/generate_alert"
+        url_check = url_base + "/api/motion_agent/check_alert"
+
+        # Send check request
+        req = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_alert_response = req.json()
+        check_alert_message = check_alert_response['alert']
+
+        time.sleep(0.3)
+
+        # Send generate request with missing file data
+        req_2 = requests.post(url_generate, data=self.auth_data, headers=self.headers)
+        generate_response = req_2.json()
+        generate_message = generate_response['status']
+
+        time.sleep(0.3)
+
+        # Send check request
+        req_3 = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_alert_response_2 = req_3.json()
+        check_alert_message_2 = check_alert_response_2['alert']
+
+        time.sleep(0.3)
+
+        # Send generate request with file data
+        payload = json.dumps({'user': self.user, 'password': self.password, 'file_path': './IMG_212.jpg'})
+        req_4 = requests.post(url_generate, data=payload, headers=self.headers)
+        generate_response_2 = req_4.json()
+        generate_message_2 = generate_response_2['status']
+
+        time.sleep(0.3)
+
+        # Send check request
+        req_5 = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_alert_response_3 = req_5.json()
+        check_alert_message_3 = check_alert_response_3['alert']
+        file_path_message = check_alert_response_3['file_path']
+
+        time.sleep(0.3)
+
+        # Send check request again to verify that notification is set to 0
+        req_6 = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_alert_response_4 = req_6.json()
+        check_alert_message_4 = check_alert_response_4['alert']
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 400)
+        self.assertEqual(req_3.status_code, 200)
+        self.assertEqual(req_4.status_code, 200)
+        self.assertEqual(req_5.status_code, 200)
+        self.assertEqual(req_6.status_code, 200)
+
+        self.assertFalse(check_alert_message)
+        self.assertEqual(generate_message, 'Error, file path data is missing')
+        self.assertFalse(check_alert_message_2)
+        self.assertEqual(generate_message_2, 'The alert has been received')
+        self.assertTrue(check_alert_message_3)
+        self.assertEqual(file_path_message, './IMG_212.jpg')
+        self.assertFalse(check_alert_message_4)
+
+##############################################################################################
