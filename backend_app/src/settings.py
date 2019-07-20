@@ -8,20 +8,20 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 ##################    STORAGE CONFIGURATION   ##################
 
 # LOGS
-LOGS_FILE_PATH = "/home/jmv74211/git/TFM_security_system_PI/backend_app/logs"
+LOGS_FILE_PATH = os.path.join(ROOT_DIR,'..', 'logs')
 
 # PATH where save photo and video files.
 PHOTO_FILES_PATH = "/home/jmv74211/Escritorio/security_files/photos"
-VIDEO_FILES_PATH =  "/home/jmv74211/Escritorio/security_files/videos"
+VIDEO_FILES_PATH = "/home/jmv74211/Escritorio/security_files/videos"
 ALERTS_FILES_PATH = "/home/jmv74211/Escritorio/security_files/alerts"
 
 ##################    CONFIGURATION FILES PATH   ##################
 
 # Module configuration file
-CONFIG_FILE_MODULE_PATH = os.path.join(ROOT_DIR, 'config','modules_config.yml')
+CONFIG_FILE_MODULE_PATH = os.path.join(ROOT_DIR, 'config', 'modules_config.yml')
 
 # Credentials file
-CONFIG_FILE_AUTHENTICATION =  os.path.join(ROOT_DIR, 'config','authentication.yml')
+CONFIG_FILE_AUTHENTICATION = os.path.join(ROOT_DIR, 'config', 'authentication.yml')
 
 ##################   API AGENT  ##################
 
@@ -44,20 +44,14 @@ API_CELERY_BACKEND = 'db+sqlite:///celery.sqlite'
 
 ##################    MOTION AGENT  ##################
 
-# Set the pin where sensor is connected. Default pin 16.
+# Set the pin GPIO.BOARD where sensor is connected. Default pin 16.
 GPIO_SENSOR_PIN_NUMBER = 16
 
 # Time to wait until check movement sensor status
 REFRESH_TIME = 5
 
-MOTION_AGENT_PATH = "/home/jmv74211/git/TFM_security_system_PI/backend_app/src/agents/motion_agent.py"
+MOTION_AGENT_PATH = os.path.join(ROOT_DIR, 'agents', 'motion_agent.py')
 
+##################    STREAMING SERVER  ##################
 
-
-
-
-
-
-
-
-
+STREAMING_SERVER_PATH = os.path.join(ROOT_DIR, 'modules', 'pistream', 'streaming_server.py')
