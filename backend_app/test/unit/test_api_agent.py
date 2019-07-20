@@ -158,7 +158,8 @@ class TestAPIAgentModule(unittest.TestCase):
 
     ##############################################################################################
 
-    def test_5_check_status_ma(self): # Cant name it with *motion_agent because os.kill will kill it by its name
+    def test_5_check_status_ma(
+            self):  # Cant name it with *streaming server because os.kill will kill this process it by its name
 
         # Check initial state
         initial_state = check_status_motion_agent()
@@ -186,4 +187,37 @@ class TestAPIAgentModule(unittest.TestCase):
         self.assertTrue(second_state)
         self.assertFalse(third_state)
 
-##############################################################################################
+    ##############################################################################################
+
+    def test_6_check_status_sv(
+            self):  # Cant name it with *streaming because os.kill will kill this process it by its name
+
+        # Check initial state
+        initial_state = check_status_streaming_server()
+
+        # Activates streaming server
+        subprocess.Popen(['python3', settings.STREAMING_SERVER_PATH], stdout = subprocess.PIPE)
+
+        time.sleep(5)
+
+        # Check new state
+        second_state = check_status_streaming_server()
+
+        # Deactivates streaming server
+        process = os.popen('pgrep -a python | grep "streaming_server" | cut -d " " -f 1')
+        pid_process = int(process.read())
+        os.kill(pid_process, signal.SIGKILL)
+        process.close()
+
+        # Check new state
+        third_state = check_status_streaming_server()
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertFalse(initial_state)
+        self.assertTrue(second_state)
+        self.assertFalse(third_state)
+
+        ##############################################################################################
