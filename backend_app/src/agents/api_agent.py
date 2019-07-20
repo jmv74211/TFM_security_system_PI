@@ -8,6 +8,7 @@ from modules.authentication import authenticate_user  # Import to user authentic
 from functools import wraps  # Import to use decorators functions
 from lib.flask_celery import make_celery  #
 import os
+import time
 import signal
 import subprocess  # Import to create a synchronous processes
 import json
@@ -89,11 +90,12 @@ Returns the status and identifier of the task
 @app.route("/api/take_photo", methods=['POST'])
 @authentication_required
 def take_photo_api():
-    task = take_photo.delay()
-
-    response = {'status': 'Photo request has been sent', 'task_id': task.id}
-
-    return jsonify(response)
+    try:
+        task = take_photo.delay()
+        return jsonify({'status': 'Photo request has been sent', 'task_id': task.id})
+    except:
+        log.error("Error when creating the asynchronous task to take a photo", exc_info=True)
+        return jsonify({'status': 'Error, please try again'}), 500
 
 
 ##############################################################################################
@@ -109,18 +111,23 @@ Returns the status and identifier of the task
 @app.route("/api/record_video", methods=['POST'])
 @authentication_required
 def record_video_api():
-    data = request.get_json()
+    try:
+        data = request.get_json()
+    except:
+        return jsonify({'status': 'Error, bad data request'}), 400
 
     if data is not None and 'recordtime' in data and data['recordtime'] > 0:
         record_time = data['recordtime']
     else:
         record_time = 10
 
-    task = record_video.delay(record_time)
-
-    response = {'status': 'A ' + repr(record_time) + ' seconds video request has been sent', 'task_id': task.id}
-
-    return jsonify(response)
+    try:
+        task = record_video.delay(record_time)
+        response = {'status': 'A ' + repr(record_time) + ' seconds video request has been sent', 'task_id': task.id}
+        return jsonify(response)
+    except:
+        log.error("Error when creating the asynchronous task to record a photo", exc_info=True)
+        return jsonify({'status': 'Error, please try again'}), 500
 
 
 ##############################################################################################
@@ -134,10 +141,9 @@ Returns the task status ['PENDING','STARTED','FAILURE',RETRY,'REVOKED','SUCCESS'
 
 @app.route("/api/check/<task_id>", methods=['GET'])
 @authentication_required
-def check_task_status(task_id):
+def check_task_status_api(task_id):
     task = celery.AsyncResult(task_id)
     response = {'status': task.state}
-
     return jsonify(response)
 
 
@@ -151,7 +157,7 @@ Returns:
 
 @app.route("/api/result/<task_id>", methods=['GET'])
 @authentication_required
-def get_task_result(task_id):
+def get_task_result_api(task_id):
     task = celery.AsyncResult(task_id)
 
     if task.ready():
@@ -175,16 +181,14 @@ Returns the request status
 @app.route("/api/stop/<task_id>", methods=['POST'])
 @authentication_required
 def stop_task_api(task_id):
-    task = celery.AsyncResult(task_id)
-    print(task.state)
-
     try:
         celery.control.revoke(task_id, terminate=True)
         response = {'status': 'Task  ' + task_id + " has been stopped successfully"}
+        return jsonify(response)
     except:
         response = {'status': 'Error while stopping task ' + task_id}
-
-    return jsonify(response)
+        log.error("Error when stopping a task with id = {}".format(task_id), exc_info=True)
+        return jsonify(response), 500
 
 
 ##############################################################################################
@@ -197,20 +201,34 @@ def stop_task_api(task_id):
 
 @app.route("/api/motion_agent/activate", methods=['POST'])
 @authentication_required
-def activate_motion_agent():
+def activate_motion_agent_api():
     if not check_status_motion_agent():
 
         motion_agent_mode = "photo"
-        data = request.get_json()
+
+        try:
+            data = request.get_json()
+        except:
+            data = None
+
         if data is not None and 'mode' in data:
             if data['mode'] == "video":
                 motion_agent_mode = "video"
+        try:
+            # Make a subprocess and redirect stdout
+            subprocess.Popen(['python3', settings.MOTION_AGENT_PATH, motion_agent_mode], stdout=subprocess.PIPE)
 
-        # Make a subprocess and redirect stdout
-        subprocess.Popen(['python3', settings.MOTION_AGENT_PATH, motion_agent_mode], stdout=subprocess.PIPE)
-
-        print("The motion agent in " + motion_agent_mode + " mode has been activated")
-        return jsonify({'status': 'The motion agent in ' + motion_agent_mode + ' mode has been activated sucessfully'})
+            # Sleep to wait to motion agent starts
+            time.sleep(1)
+            if check_status_motion_agent():
+                log.info("The motion agent in " + motion_agent_mode + " mode has been activated")
+                return jsonify( {'status': 'The motion agent in ' + motion_agent_mode + ' mode has been activated sucessfully'})
+            else:
+                log.error("The motion agent could not be started", exc_info=True)
+                return jsonify({'status': 'The motion agent could not be started'}), 500
+        except:
+            log.error("The motion agent could not be started", exc_info=True)
+            return jsonify({'status': 'Error, the motion agent could not be started'}), 500
     else:
         return jsonify({'status': 'The motion agent was already activated'})
 
@@ -225,18 +243,30 @@ def activate_motion_agent():
 
 @app.route("/api/motion_agent/deactivate", methods=['POST'])
 @authentication_required
-def deactivate_motion_agent():
+def deactivate_motion_agent_api():
     if check_status_motion_agent():
         process = os.popen('pgrep -a python | grep "motion_agent" | cut -d " " -f 1')
         pid_process = int(process.read())
-        os.kill(pid_process, signal.SIGKILL)
-        process.close()
 
-        print("The motion has been deactivated")
-        return jsonify({'status': 'The motion agent has been deactivated sucessfully'})
+        try:
+            os.kill(pid_process, signal.SIGKILL)
+
+            # Sleep to wait to streaming server stops
+            time.sleep(1)
+            if not check_status_streaming_server():
+                log.info("Motion agent has been stopped")
+                return jsonify({'status': 'The motion agent has been deactivated sucessfully'})
+            else:
+                log.error("The motion agent could not be stopped", exc_info=True)
+                return jsonify({'status': 'The motion agent could not be stopped'}), 500
+        except:
+            log.error("Motion agent could not stop", exc_info=True)
+            return jsonify({'status': 'Error: Motion agent could not be stopped'}), 500
+        finally:
+            process.close()
 
     else:
-        return jsonify({'status': 'The agent was already deactivated!'})
+        return jsonify({'status': 'The motion agent was already deactivated'})
 
 
 ##############################################################################################
@@ -249,7 +279,7 @@ def deactivate_motion_agent():
 
 @app.route("/api/motion_agent/check_status", methods=['GET'])
 @authentication_required
-def check_motion_agent_status():
+def check_motion_agent_status_api():
     if check_status_motion_agent():
         return jsonify({'status': 'ON'})
 
@@ -269,14 +299,14 @@ Returns the request status
 
 @app.route("/api/motion_agent/generate_alert", methods=['POST'])
 @authentication_required
-def generate_motion_alert():
+def generate_motion_alert_api():
     global motion_agent_alert
     global file_path_alert
 
     try:
         data = request.get_json()
     except:
-        return jsonify({'status': 'Error, need credentials and video/photo file path in data request'})
+        return jsonify({'status': 'Error, need credentials and video/photo file path in data request'}), 400
 
     if data is not None and 'file_path' in data:
         file_path_alert = data['file_path']
@@ -297,11 +327,11 @@ Returns True/False. If true, a file_path_alert is added.
 
 @app.route("/api/motion_agent/check_alert", methods=['GET'])
 @authentication_required
-def check_motion_agent_alert():
+def check_motion_agent_alert_api():
     global motion_agent_alert
+    global file_path_alert
 
     if motion_agent_alert == 1:
-        global file_path_alert
         motion_agent_alert = 0
         return jsonify({'alert': True, 'file_path': file_path_alert})
     else:
@@ -310,6 +340,80 @@ def check_motion_agent_alert():
 
 ##############################################################################################
 
+
+"""
+    Function to activate the streaming mode
+"""
+
+
+@app.route("/api/streaming/activate", methods=['POST'])
+@authentication_required
+def activate_streaming_mode_api():
+    if not check_status_streaming_server():
+
+        # Make a subprocess and redirect stdout
+        try:
+            subprocess.Popen(['python3', settings.STREAMING_SERVER_PATH], stdout=subprocess.PIPE)
+
+            # Sleep to wait to streaming server starts
+            time.sleep(5)
+            if check_status_streaming_server():
+                log.info("Streaming server has been activated")
+                return jsonify({'status': 'The streaming mode has been activated sucessfully'})
+            else:
+                log.error("The streaming server could not be started", exc_info=True)
+                return jsonify({'status': 'The streaming server could not be started'}), 500
+
+        except:
+            log.error("The streaming server could not be started", exc_info=True)
+            return jsonify({'status': 'The streaming server could not be started'}), 500
+    else:
+        return jsonify({'status': 'The streaming mode was already activated'})
+
+
+##############################################################################################
+
+"""
+    Function to deactivate the streaming mode.
+"""
+
+
+@app.route("/api/streaming/deactivate", methods=['POST'])
+@authentication_required
+def deactivate_streaming_mode_api():
+    if check_status_streaming_server():
+        process = os.popen('pgrep -a python | grep "streaming_server" | cut -d " " -f 1')
+        pid_process = int(process.read())
+
+        try:
+            os.kill(pid_process, signal.SIGKILL)
+
+            # Sleep to wait to streaming server stops
+            time.sleep(1)
+            if not check_status_streaming_server():
+                log.info("Streaming server has been disconnected")
+                return jsonify({'status': 'The streaming server has been stopped sucessfully'})
+            else:
+                log.error("The streaming server could not be stopped", exc_info=True)
+                return jsonify({'status': 'The streaming server could not be stopped'}), 500
+        except:
+            log.error("The streaming server could not be stopped", exc_info=True)
+            return jsonify({'status': 'The streaming server could not be stopped'}), 500
+        finally:
+            process.close()
+    else:
+        return jsonify({'status': 'The streaming mode was already deactivated!'})
+
+##############################################################################################
+
+@app.route("/api/streaming/check_status", methods=['GET'])
+@authentication_required
+def check_streaming_server_status_api():
+    if check_status_streaming_server():
+        return jsonify({'status': 'ON'})
+
+    else:
+        return jsonify({'status': 'OFF'})
 
 ##############################################################################################
 
@@ -422,17 +526,40 @@ def record_video(record_time, video_path=settings.VIDEO_FILES_PATH):
 
 
 def check_status_motion_agent():
-    process = os.popen('pgrep -a python | grep "motion_agent" | cut -d " " -f1')
-    pid_process = process.read()
-    process.close()
+    try:
+        process = os.popen('pgrep -a python | grep "motion_agent" | cut -d " " -f1')
+        pid_process = process.read()
+    except:
+        log.error("Error while checking motion agent status", exc_info=True)
+    finally:
+        process.close()
+
+    if (pid_process != ""):
+        return True
+    else:
+        return False
+
+
+##############################################################################################
+
+"""
+    Function to check the streaming mode proccess is running. True if is running, False otherwise
+"""
+
+
+def check_status_streaming_server():
+    try:
+        process = os.popen('pgrep -a python | grep "streaming_server" | cut -d " " -f 1')
+        pid_process = process.read()
+    except:
+        log.error("Error while checking streaming server status", exc_info=True)
+    finally:
+        process.close()
 
     if (pid_process == ""):
         return False
     else:
         return True
-
-
-##############################################################################################
 
 
 ##############################################################################################
