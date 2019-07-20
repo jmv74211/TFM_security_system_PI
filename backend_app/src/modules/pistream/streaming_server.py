@@ -20,6 +20,7 @@ from ws4py.server.wsgirefserver import (
     WebSocketWSGIRequestHandler,
 )
 from ws4py.server.wsgiutils import WebSocketWSGIApplication
+import settings
 
 ###########################################
 # CONFIGURATION
@@ -35,6 +36,10 @@ JSMPEG_MAGIC = b'jsmp'
 JSMPEG_HEADER = Struct('>4sHH')
 VFLIP = False
 HFLIP = False
+
+INDEX_FILE_PATH = os.path.join(settings.ROOT_DIR, 'modules', 'pistream', 'index.html')
+JSMPG_FILE_PATH = os.path.join(settings.ROOT_DIR, 'modules', 'pistream', 'jsmpg.js')
+
 
 ###########################################
 
@@ -74,12 +79,12 @@ class StreamingHttpHandler(BaseHTTPRequestHandler):
 class StreamingHttpServer(HTTPServer):
     def __init__(self):
         super(StreamingHttpServer, self).__init__(
-                ('', HTTP_PORT), StreamingHttpHandler)
-        #with io.open('pistream/index.html', 'r') as f:
-        with io.open('index.html', 'r') as f:
+            ('', HTTP_PORT), StreamingHttpHandler)
+        with io.open(INDEX_FILE_PATH, 'r') as f:
+            # with io.open('index.html', 'r') as f:
             self.index_template = f.read()
-        #with io.open('pistream/jsmpg.js', 'r') as f:
-        with io.open('jsmpg.js', 'r') as f:
+        with io.open(JSMPG_FILE_PATH, 'r') as f:
+            # with io.open('jsmpg.js', 'r') as f:
             self.jsmpg_content = f.read()
 
 
@@ -137,9 +142,9 @@ def main():
     with picamera.PiCamera() as camera:
         camera.resolution = (WIDTH, HEIGHT)
         camera.framerate = FRAMERATE
-        camera.vflip = VFLIP # flips image rightside up, as needed
-        camera.hflip = HFLIP # flips image left-right, as needed
-        sleep(1) # camera warm-up time
+        camera.vflip = VFLIP  # flips image rightside up, as needed
+        camera.hflip = HFLIP  # flips image left-right, as needed
+        sleep(1)  # camera warm-up time
         print('Initializing websockets server on port %d' % WS_PORT)
         WebSocketWSGIHandler.http_version = '1.1'
         websocket_server = make_server(
