@@ -354,7 +354,7 @@ class TestLoggerModule(unittest.TestCase):
         req_2_data = req_2.json()
         req_2_status = req_2_data['status']  # STARTED
 
-        time.sleep(2)
+        time.sleep(1)
 
         # STOP TASK
         url_task_stop = self.API_url_path + "/api/stop/" + task_id
@@ -362,6 +362,8 @@ class TestLoggerModule(unittest.TestCase):
         req_3_data = req_3.json()
         req_3_status = req_3_data['status']  # STARTED
         stop_task_success = 'successfully' in req_3_status  # Message contains successfully that means OK
+
+        time.sleep(1)
 
         # CHECK TASK STATUS
         req_4 = requests.get(url_task_check, data=self.auth_data, headers=self.headers)
@@ -593,4 +595,57 @@ class TestLoggerModule(unittest.TestCase):
         self.assertEqual(file_path_message, './IMG_212.jpg')
         self.assertFalse(check_alert_message_4)
 
+    ##############################################################################################
+
+    def test11_activate_check_deactivate_sv(self): # Streaming server
+        url_base = settings.API_AGENT_IP_ADDRESS + ":" + repr(settings.API_AGENT_RUNNING_PORT)
+        url_activate = url_base + "/api/streaming/activate"
+        url_deactivate = url_base + "/api/streaming/deactivate"
+        url_check = url_base + "/api/streaming/check_status"
+
+        # Send check request
+        req = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_status_response = req.json()
+        check_status_message = check_status_response['status']
+
+        # Send an activate response
+        req_2 = requests.post(url_activate, data=self.auth_data, headers=self.headers)
+        activate_response = req_2.json()
+        activate_message = activate_response['status']
+
+        # Send check request
+        req_3 = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_status_response_2 = req_3.json()
+        check_status_message_2 = check_status_response_2['status']
+
+        # Send a deactivate request
+        req_4 = requests.post(url_deactivate, data=self.auth_data, headers=self.headers)
+        deactivate_response = req_4.json()
+        deactivate_message = deactivate_response['status']
+
+        # Send check request
+        req_5 = requests.get(url_check, data=self.auth_data, headers=self.headers)
+        check_status_response_3 = req_5.json()
+        check_status_message_3 = check_status_response_3['status']
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertEqual(req.status_code, 200)
+        self.assertEqual(req_2.status_code, 200)
+        self.assertEqual(req_3.status_code, 200)
+        self.assertEqual(req_4.status_code, 200)
+        self.assertEqual(req_5.status_code, 200)
+
+        self.assertEqual(check_status_message, 'OFF')
+        self.assertEqual(activate_message, 'The streaming mode has been activated sucessfully')
+        self.assertEqual(check_status_message_2, 'ON')
+        self.assertEqual(deactivate_message, 'The streaming server has been stopped sucessfully')
+        self.assertEqual(check_status_message_3, 'OFF')
+
+    ##############################################################################################
+
+
 ##############################################################################################
+
