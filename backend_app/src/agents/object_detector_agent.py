@@ -3,8 +3,8 @@ import os
 import tensorflow as tf
 from distutils.version import StrictVersion
 from PIL import Image
-import time
 import settings
+from flask import Flask, request, jsonify, logging  # Import to use web service
 
 if StrictVersion(tf.__version__) < StrictVersion('1.12.0'):
     raise ImportError('Please upgrade your TensorFlow installation to v1.12.*.')
@@ -13,11 +13,18 @@ from modules.object_detector.utils import label_map_util
 
 ##############################################################################################
 
-start_time = time.time()
+"""
+    OBJECT DETECTOR AGENT: Receives a request a with a photo file path and makes a response with
+    a objects detected list detected in that photo.
+"""
 
-# What model to download.
+# Main instance app
+app = Flask(__name__)
+
+# Model to use
 MODEL_NAME = 'ssdlite_mobilenet_v2_coco_2018_05_09'
 
+# Project root dir
 ROOT_DIR = settings.ROOT_DIR
 
 TEST_IMAGES_DIR = os.path.join(ROOT_DIR, 'modules', 'object_detector', 'test_images')
@@ -30,7 +37,6 @@ PATH_TO_FROZEN_GRAPH = os.path.join(ROOT_DIR, 'modules', 'object_detector', 'mod
 PATH_TO_LABELS = os.path.join(ROOT_DIR, 'modules', 'object_detector', 'labels', 'mscoco_label_map.pbtxt')
 
 ##############################################################################################
-
 
 ## Load the label map.
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
@@ -57,8 +63,12 @@ detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
 detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
 num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 
-
 ##############################################################################################
+
+"""
+    Funtion to convert image into numpy array formatted
+"""
+
 
 def load_image_into_numpy_array(image):
     (im_width, im_height) = image.size
@@ -68,7 +78,41 @@ def load_image_into_numpy_array(image):
 
 ##############################################################################################
 
-def get_result(image_path):
+"""
+    API function that makes a response with a list of objects detected in the photo path
+    received.
+"""
+
+
+@app.route("/api/detector", methods=['GET'])
+def get_detector_result_api():
+    try:
+        data = request.get_json()
+    except:
+        return jsonify({'status': 'Error, bad data request'}), 400
+
+    if data is None or not 'file_path' in data:
+        return jsonify({'status': 'Error, file_path data missing'}), 400
+
+    file_path = data['file_path']
+    exist_image = os.path.isfile(file_path)
+
+    if not exist_image:
+        return jsonify({'status': 'Error, file_path does not exist'}), 400
+
+    objects = get_detector_result(file_path)
+
+    return jsonify({'objects': objects})
+
+
+##############################################################################################
+
+"""
+    Funtion to get the objects detected list in the photo
+"""
+
+
+def get_detector_result(image_path):
     image = Image.open(image_path)
     # the array based representation of the image will be used later in order to prepare the
     # result image with boxes and labels on it.
@@ -84,7 +128,7 @@ def get_result(image_path):
     for index, value in enumerate(classes[0]):
         object_dict = {}
         if scores[0, index] > threshold:
-            object_dict[(category_index.get(value)).get('name')] = scores[0, index]
+            object_dict[(category_index.get(value)).get('name')] = float(scores[0, index])
             objects.append(object_dict)
 
     return objects
@@ -92,24 +136,5 @@ def get_result(image_path):
 
 ##############################################################################################
 
-# print("--- START GETTING RESULTS %s seconds ---" % (time.time() - start_time))
-
-# print("--- FIRST --> %s seconds ---" % (time.time() - start_time))
-
-objects_1 = get_result(os.path.join(TEST_IMAGES_DIR, 'example.jpg'))
-print("Objects_1 = " + objects_1.__repr__())
-
-# print("--- SECOND --> %s seconds ---" % (time.time() - start_time))
-
-objects_2 = get_result(os.path.join(TEST_IMAGES_DIR, '1.jpg'))
-print("Objects_2 = " + objects_2.__repr__())
-
-# print("--- THIRD --> %s seconds ---" % (time.time() - start_time))
-
-objects_3 = get_result(os.path.join(TEST_IMAGES_DIR, '2.jpg'))
-print("Objects_3 = " + objects_3.__repr__())
-# print("--- FOURTH--> %s seconds ---" % (time.time() - start_time))
-
-objects_4 = get_result(os.path.join(TEST_IMAGES_DIR, '3.jpg'))
-print("Objects_4 = " + objects_4.__repr__())
-# print("--- FINISH AT --> %s seconds ---" % (time.time() - start_time))
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=settings.DETECTOR_AGENT_RUNNING_PORT, debug=False)
