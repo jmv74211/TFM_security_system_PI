@@ -25,13 +25,13 @@ CONFIG_FILE_AUTHENTICATION = os.path.join(ROOT_DIR, 'config', 'authentication.ym
 
 ##################   API AGENT  ##################
 
+API_AGENT_IP_ADDRESS = "http://192.168.1.100"
+
 # Running port 10000 by default
 API_AGENT_RUNNING_PORT = 10000
 
 # DEBUG MODE
 DEBUG = True
-
-API_AGENT_IP_ADDRESS = "http://192.168.1.100"
 
 # Set here your RAW password
 API_PASSWORD = os.environ.get('TFM_PASSWORD')
@@ -40,7 +40,7 @@ API_PASSWORD = os.environ.get('TFM_PASSWORD')
 API_CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
 
 # Database where save tasks states and results
-API_CELERY_BACKEND = 'db+sqlite:///celery.sqlite'
+API_CELERY_BACKEND = 'db+sqlite:///api_agent_celery.sqlite'
 
 ##################    MOTION AGENT  ##################
 
@@ -52,6 +52,20 @@ REFRESH_TIME = 5
 
 MOTION_AGENT_PATH = os.path.join(ROOT_DIR, 'agents', 'motion_agent.py')
 
+MOTION_AGENT_CELERY_BACKEND = 'db+sqlite:///motion_agent_celery.sqlite'
+
 ##################    STREAMING SERVER  ##################
 
 STREAMING_SERVER_PATH = os.path.join(ROOT_DIR, 'modules', 'pistream', 'streaming_server.py')
+
+##################    DETECTOR_AGENT  ##################
+
+DETECTOR_AGENT_IP_ADDRESS = "http://192.168.1.100"
+
+# Running port 11000 by default
+DETECTOR_AGENT_RUNNING_PORT = 11000
+
+# Detector agent status, default False. To activate it, change its value to True
+DETECTOR_AGENT_STATUS = False
+
+
