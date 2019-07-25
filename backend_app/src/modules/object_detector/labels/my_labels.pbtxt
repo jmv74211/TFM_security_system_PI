@@ -1,0 +1,17 @@
+item {
+  name: "/m/01g317"
+  id: 1
+  display_name: "person"
+}
+
+item {
+  name: "/m/01yrx"
+  id: 2
+  display_name: "cat"
+}
+item {
+  name: "/m/0bt9lr"
+  id: 3
+  display_name: "dog"
+}
+
