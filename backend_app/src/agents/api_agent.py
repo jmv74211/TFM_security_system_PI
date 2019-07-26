@@ -50,8 +50,10 @@ def authentication_required(f):
     def decorated(*args, **kwargs):
 
         try:
+
             data = json.loads(request.data.decode('utf-8'),
                               strict=False)  # strict = False allow for escaped chardata = request.get_json()
+
             if data is not None and 'user' in data and 'password' in data:
                 if authenticate_user(data['user'], data['password']):
                     return f(*args, **kwargs)
@@ -70,10 +72,6 @@ def authentication_required(f):
 
 ##############################################################################################
 
-
-##############################################################################################
-
-
 # *********************************************************************************************
 # ********************************** API FUNCTIONS ****************************************
 # *********************************************************************************************
@@ -91,7 +89,8 @@ Returns the status and identifier of the task
 @authentication_required
 def take_photo_api():
     try:
-        task = take_photo.delay()
+        # task = take_photo.delay()
+        task = take_photo.apply_async(queue='api_agent')
         return jsonify({'status': 'Photo request has been sent', 'task_id': task.id})
     except:
         log.error("Error when creating the asynchronous task to take a photo", exc_info=True)
@@ -122,11 +121,16 @@ def record_video_api():
         record_time = 10
 
     try:
-        task = record_video.delay(record_time)
+
+        # apply sync method works with an argument list, so it is necessary add the record time argument to one.
+        argument_list = []
+        argument_list.append(record_time)
+        task = record_video.apply_async(args=argument_list, queue='api_agent')
         response = {'status': 'A ' + repr(record_time) + ' seconds video request has been sent', 'task_id': task.id}
         return jsonify(response)
     except:
-        log.error("Error when creating the asynchronous task to record a photo", exc_info=True)
+        log.error("Error when creating the asynchronous task to record a video", exc_info=True)
+        raise
         return jsonify({'status': 'Error, please try again'}), 500
 
 
@@ -151,7 +155,7 @@ def check_task_status_api(task_id):
 
 """ Gets task result
 
-Returns: 
+Returns: Response with True and result if task has finished, False otherwise
 """
 
 
@@ -222,7 +226,8 @@ def activate_motion_agent_api():
             time.sleep(1)
             if check_status_motion_agent():
                 log.info("The motion agent in " + motion_agent_mode + " mode has been activated")
-                return jsonify( {'status': 'The motion agent in ' + motion_agent_mode + ' mode has been activated sucessfully'})
+                return jsonify(
+                    {'status': 'The motion agent in ' + motion_agent_mode + ' mode has been activated sucessfully'})
             else:
                 log.error("The motion agent could not be started", exc_info=True)
                 return jsonify({'status': 'The motion agent could not be started'}), 500
@@ -404,6 +409,7 @@ def deactivate_streaming_mode_api():
     else:
         return jsonify({'status': 'The streaming mode was already deactivated!'})
 
+
 ##############################################################################################
 
 @app.route("/api/streaming/check_status", methods=['GET'])
@@ -414,6 +420,7 @@ def check_streaming_server_status_api():
 
     else:
         return jsonify({'status': 'OFF'})
+
 
 ##############################################################################################
 
