@@ -1,4 +1,6 @@
 import RPi.GPIO as GPIO
+from flask import Flask, jsonify
+from lib.flask_celery import make_celery
 from time import sleep
 import requests
 import settings
@@ -9,6 +11,7 @@ from modules.photo import Photo
 from modules.video import Video
 from agents.api_agent import read_photo_configuration, read_video_configuration
 from modules.logger import MotionAgentLogger
+from celery.result import allow_join_result
 
 ##############################################################################################
 
@@ -18,8 +21,13 @@ from modules.logger import MotionAgentLogger
     The motion agent functionality is:
      1. Dectect a sensor movement
      2. Take a video/picture
-     3. Send a request with file_path data to generate and alert in API agent
-
+     3. Check if object detector mode is enabled
+        IF detector mode enabled:
+            + Send an async request to object detector agent
+            + If the response list contains a person key, then send a request with file_path
+              to generate an alert in API agent
+        ELSE
+            + Send a request with file_path to generate an alert in API agent
 """
 
 with open(settings.CONFIG_FILE_AUTHENTICATION, 'r') as ymlfile:
@@ -50,7 +58,45 @@ motion_agent_mode = "photo"
 # Logger
 logger = MotionAgentLogger()
 
+# Main instance app
+app = Flask(__name__)
+
+app.config.update(
+    CELERY_BROKER_URL=settings.API_CELERY_BROKER_URL,
+    CELERY_BACKEND=settings.MOTION_AGENT_CELERY_BACKEND
+)
+
+celery = make_celery(app)
+
+
 ##############################################################################################
+
+"""
+    Callback task class to process the object detector agent response
+"""
+
+class CallbackTask(celery.Task):
+    def on_success(self, retval, task_id, args, kwargs):
+        task = celery.AsyncResult(task_id)
+
+        with allow_join_result():
+            person_detected = task.get()
+            if person_detected:
+                logger.debug("Person detected, sending request to API agent to generate an alert")
+                # Generate an alert in API agent
+                generate_api_agent_alert.apply_async(args=args, queue='motion_agent')
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        logger.error("Error while processing send_object_detector_agent_request task ")
+
+
+##############################################################################################
+
+""" Method to detect if there is a person in a list
+    
+Returns: True if there is a person in the list object, False otherwise
+
+"""
 
 def detect_person(objects):
     person_detected = False;
@@ -63,6 +109,61 @@ def detect_person(objects):
 
     return person_detected
 
+
+##############################################################################################
+
+
+""" Async task to send a request to object detector agent giving a file path
+
+Returns: True if there is a person in the list object, False otherwise
+
+"""
+
+@celery.task(name="send_object_detector_agent_request", base=CallbackTask)
+def send_object_detector_agent_request(file_path):
+    try:
+        payload = {'user': user, 'password': password, 'file_path': file_path}
+        headers = {'content-type': 'application/json'}
+        logger.debug("Sending a request to detector agent")
+        start_time = time.time()
+        req = requests.get(detector_agent_host + "/api/detector", json=payload, headers=headers)
+        detector_time = time.time() - start_time
+        logger.info(
+            "Detector request sent, and it has been responsed in = {} seconds".format(detector_time))
+
+        person_detected = detect_person(req.json())
+        logger.info("Person detected = {}".format(person_detected))
+        return person_detected
+
+    except:
+        logger.error(
+            "Error while trying to send an alert to Detector API agent with address {}.¿It is running?".format(
+                detector_agent_host))
+
+
+##############################################################################################
+
+
+""" 
+    Async task to generate an alert to API agent
+    
+"""
+
+@celery.task(name="generate_api_agent_alert", base=CallbackTask)
+def generate_api_agent_alert(args):
+    headers = {'content-type': 'application/json'}
+    logger.debug("FILE_PATH = " + repr(args))
+    payload = {'user': user, 'password': password, 'file_path': args}
+    request_sended = False
+    try:
+        requests.post(main_agent_host + "/api/motion_agent/generate_alert", json=payload, headers=headers)
+        request_sended = True
+    except:
+        logger.error(
+            "Error while trying to send an alert to API agent with address {}.¿It is running?".format(
+                main_agent_host))
+
+    return request_sended
 ##############################################################################################
 
 if __name__ == "__main__":
@@ -103,29 +204,17 @@ if __name__ == "__main__":
 
             # If detector agent is enabled, filter the image and generate an alert if there is a person in the photo
             if settings.DETECTOR_AGENT_STATUS:
-
-                try:
-                    logger.debug("Sending a request to detector agent")
-                    start_time = time.time()
-                    req = requests.get(detector_agent_host + "/api/detector", json=payload, headers=headers)
-                    detector_time = time.time() - start_time
-                    logger.info("Detector request sent, and it has been responsed in = {} seconds".format(detector_time))
-                except:
-                    logger.error(
-                        "Error while trying to send an alert to Detector API agent with address {}.¿It is running?".format(
-                            detector_agent_host))
-
-                person_detected = detect_person(req.json())
-
-                logger.info("Person detected = {}".format(person_detected))
+                argument_list = [file_path]
+                send_object_detector_agent_request.apply_async(args=argument_list, queue='motion_agent')
             # If detector agent is disabled, generate an alert
             else:
                 try:
-                    motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/generate_alert", json=payload,
+                    motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/generate_alert",
+                                                         json=payload,
                                                          headers=headers)
                 except:
-                    logger.error("Error while trying to send an alert to API agent with address {}.¿It is running?".format(
-                        main_agent_host))
+                    logger.error(
+                        "Error while trying to send an alert to API agent with address {}.¿It is running?".format(
+                            main_agent_host))
 
             sleep(settings.REFRESH_TIME)
-

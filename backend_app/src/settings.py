@@ -66,6 +66,6 @@ DETECTOR_AGENT_IP_ADDRESS = "http://192.168.1.100"
 DETECTOR_AGENT_RUNNING_PORT = 11000
 
 # Detector agent status, default False. To activate it, change its value to True
-DETECTOR_AGENT_STATUS = False
+DETECTOR_AGENT_STATUS = True
 
 
