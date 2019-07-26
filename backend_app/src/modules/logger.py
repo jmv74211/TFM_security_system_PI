@@ -387,3 +387,14 @@ class MotionAgentLogger(Logger):
         super().__init__(logger_name, log_path)
 
 ##############################################################################################
+
+"""
+    Detector object agent logger
+"""
+
+class DetectorObjectAgentLogger(Logger):
+
+    def __init__(self, logger_name="detector_object_agent", log_path=config_log_path):
+        super().__init__(logger_name, log_path)
+
+##############################################################################################
