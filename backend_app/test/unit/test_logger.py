@@ -16,8 +16,20 @@ class TestLoggerModule(unittest.TestCase):
     def setUpClass(self):
         username = getpass.getuser()
         self.test_path = "/home/" + username
-
         self.appFileLog = "security_system_PI_APP.log"
+
+        # Logs message
+        self.info_message = "TEST: First test message"
+        self.warning_message = "TEST: Second test message"
+        self.error_message = "TEST: Third test message"
+        self.critical_message = "TEST: Fourth test message"
+
+        # Logs level
+        self. level_info = "INFO"
+        self.level_warning = "WARNING"
+        self.level_error = "ERROR"
+        self.level_critical = "CRITICAL"
+
 
     ##############################################################################################
 
@@ -202,23 +214,11 @@ class TestLoggerModule(unittest.TestCase):
     def test7_video_logging(self):
         video_logger = VideoLogger(log_path=self.test_path)
 
-        # Logs message
-        info_message = "First test message"
-        warning_message = "Second test message"
-        error_message = "Third test message"
-        critical_message = "Fourth test message"
-
-        # Logs level
-        level_info = "INFO"
-        level_warning = "WARNING"
-        level_error = "ERROR"
-        level_critical = "CRITICAL"
-
         # Make logs
-        video_logger.info(info_message)
-        video_logger.warning(warning_message)
-        video_logger.error(error_message)
-        video_logger.critical(critical_message)
+        video_logger.info(self.info_message)
+        video_logger.warning(self.warning_message)
+        video_logger.error(self.error_message)
+        video_logger.critical(self.critical_message)
 
         # Path logs
         video_log_path = self.test_path + "/" + video_logger.logger_name + ".log"
@@ -246,22 +246,22 @@ class TestLoggerModule(unittest.TestCase):
         # Check if log files have the messages content
 
         # info level
-        video_log_has_message_info = info_message in video_log_content and level_info in video_log_content
-        app_log_has_message_info = info_message in app_log_content and level_info in app_log_content
+        video_log_has_message_info = self.info_message in video_log_content and self.level_info in video_log_content
+        app_log_has_message_info = self.info_message in app_log_content and self.level_info in app_log_content
 
         # warning level
-        video_log_has_message_warning = warning_message in video_log_content and level_warning in video_log_content
-        app_log_has_message_warning = warning_message in app_log_content and level_warning in app_log_content
+        video_log_has_message_warning = self.warning_message in video_log_content and self.level_warning in video_log_content
+        app_log_has_message_warning = self.warning_message in app_log_content and self.level_warning in app_log_content
 
         # level error. In this level it is necessary to check app_log_error file too
-        video_log_has_message_error = error_message in video_log_content and level_error in video_log_content
-        app_log_has_message_error = error_message in app_log_content and level_error in app_log_content
-        app_log_error_has_message_error = error_message in app_log_error_content and level_error in app_log_error_content
+        video_log_has_message_error = self.error_message in video_log_content and self.level_error in video_log_content
+        app_log_has_message_error = self.error_message in app_log_content and self.level_error in app_log_content
+        app_log_error_has_message_error = self.error_message in app_log_error_content and self.level_error in app_log_error_content
 
         # critical level. In this level it is necessary to check app_log_error file too
-        video_log_has_message_critical = critical_message in video_log_content and level_critical in video_log_content
-        app_log_has_message_critical = critical_message in app_log_content and level_critical in app_log_content
-        app_log_error_has_message_critical = critical_message in app_log_error_content and level_critical in app_log_error_content
+        video_log_has_message_critical = self.critical_message in video_log_content and self.level_critical in video_log_content
+        app_log_has_message_critical = self.critical_message in app_log_content and self.level_critical in app_log_content
+        app_log_error_has_message_critical = self.critical_message in app_log_error_content and self.level_critical in app_log_error_content
 
         # Remove log files
         os.remove(video_log_path)
@@ -304,23 +304,11 @@ class TestLoggerModule(unittest.TestCase):
     def test8_API_agent_logging(self):
         api_agent_logger = APIAgentLogger(log_path=self.test_path)
 
-        # Logs message
-        info_message = "First test message"
-        warning_message = "Second test message"
-        error_message = "Third test message"
-        critical_message = "Fourth test message"
-
-        # Logs level
-        level_info = "INFO"
-        level_warning = "WARNING"
-        level_error = "ERROR"
-        level_critical = "CRITICAL"
-
         # Make logs
-        api_agent_logger.info(info_message)
-        api_agent_logger.warning(warning_message)
-        api_agent_logger.error(error_message)
-        api_agent_logger.critical(critical_message)
+        api_agent_logger.info(self.info_message)
+        api_agent_logger.warning(self.warning_message)
+        api_agent_logger.error(self.error_message)
+        api_agent_logger.critical(self.critical_message)
 
         # Path logs
         api_agent_log_path = self.test_path + "/" + api_agent_logger.logger_name + ".log"
@@ -348,22 +336,22 @@ class TestLoggerModule(unittest.TestCase):
         # Check if log files have the messages content
 
         # info level
-        api_agent_log_has_message_info = info_message in api_agent_content and level_info in api_agent_content
-        app_log_has_message_info = info_message in app_log_content and level_info in app_log_content
+        api_agent_log_has_message_info = self.info_message in api_agent_content and self.level_info in api_agent_content
+        app_log_has_message_info = self.info_message in app_log_content and self.level_info in app_log_content
 
         # warning level
-        video_log_has_message_warning = warning_message in api_agent_content and level_warning in api_agent_content
-        app_log_has_message_warning = warning_message in app_log_content and level_warning in app_log_content
+        api_agent_log_has_message_warning = self.warning_message in api_agent_content and self.level_warning in api_agent_content
+        app_log_has_message_warning = self.warning_message in app_log_content and self.level_warning in app_log_content
 
         # level error. In this level it is necessary to check app_log_error file too
-        api_agent_log_has_message_error = error_message in api_agent_content and level_error in api_agent_content
-        app_log_has_message_error = error_message in app_log_content and level_error in app_log_content
-        app_log_error_has_message_error = error_message in app_log_error_content and level_error in app_log_error_content
+        api_agent_log_has_message_error = self.error_message in api_agent_content and self.level_error in api_agent_content
+        app_log_has_message_error = self.error_message in app_log_content and self.level_error in app_log_content
+        app_log_error_has_message_error = self.error_message in app_log_error_content and self.level_error in app_log_error_content
 
         # critical level. In this level it is necessary to check app_log_error file too
-        api_agent_log_has_message_critical = critical_message in api_agent_content and level_critical in api_agent_content
-        app_log_has_message_critical = critical_message in app_log_content and level_critical in app_log_content
-        app_log_error_has_message_critical = critical_message in app_log_error_content and level_critical in app_log_error_content
+        api_agent_log_has_message_critical = self.critical_message in api_agent_content and self.level_critical in api_agent_content
+        app_log_has_message_critical = self.critical_message in app_log_content and self.level_critical in app_log_content
+        app_log_error_has_message_critical = self.critical_message in app_log_error_content and self.level_critical in app_log_error_content
 
         # Remove log files
         os.remove(api_agent_log_path)
@@ -386,7 +374,7 @@ class TestLoggerModule(unittest.TestCase):
         self.assertTrue(api_agent_log_has_message_info)
         self.assertTrue(app_log_has_message_info)
 
-        self.assertTrue(video_log_has_message_warning)
+        self.assertTrue(api_agent_log_has_message_warning)
         self.assertTrue(app_log_has_message_warning)
 
         self.assertTrue(api_agent_log_has_message_error)
@@ -403,24 +391,193 @@ class TestLoggerModule(unittest.TestCase):
 
     ##############################################################################################
 
-    def test9_photo_logging(self):
-        # Logs message
-        info_message = "First test message"
-        warning_message = "Second test message"
-        error_message = "Third test message"
-        critical_message = "Fourth test message"
-
-        # Logs level
-        level_info = "INFO"
-        level_warning = "WARNING"
-        level_error = "ERROR"
-        level_critical = "CRITICAL"
+    def test9_motion_agent_logging(self):
+        motion_agent_logger = MotionAgentLogger(log_path=self.test_path)
 
         # Make logs
-        self.logger.info(info_message)
-        self.logger.warning(warning_message)
-        self.logger.error(error_message)
-        self.logger.critical(critical_message)
+        motion_agent_logger.info(self.info_message)
+        motion_agent_logger.warning(self.warning_message)
+        motion_agent_logger.error(self.error_message)
+        motion_agent_logger.critical(self.critical_message)
+
+        # Path logs
+        motion_agent_log_path = self.test_path + "/" + motion_agent_logger.logger_name + ".log"
+        app_log_path = self.test_path + "/" + app_file_log
+        app_error_log_path = self.test_path + "/" + app_file_log_error
+
+        # Check if files exist
+        exist_motion_agent_log = os.path.isfile(motion_agent_log_path)
+        exist_app_log = os.path.isfile(app_log_path)
+        exist_app_error_log = os.path.isfile(app_error_log_path)
+
+        # Read files
+        f_1 = open(motion_agent_log_path, "r")
+        motion_agent_content = f_1.read()
+        f_1.close()
+
+        f_2 = open(app_log_path, "r")
+        app_log_content = f_2.read()
+        f_2.close()
+
+        f_3 = open(app_error_log_path, "r")
+        app_log_error_content = f_3.read()
+        f_3.close()
+
+        # Check if log files have the messages content
+
+        # info level
+        motion_agent_log_has_message_info = self.info_message in motion_agent_content and self.level_info in motion_agent_content
+        app_log_has_message_info = self.info_message in app_log_content and self.level_info in app_log_content
+
+        # warning level
+        motion_agent_log_has_message_warning = self.warning_message in motion_agent_content and self.level_warning in motion_agent_content
+        app_log_has_message_warning = self.warning_message in app_log_content and self.level_warning in app_log_content
+
+        # level error. In this level it is necessary to check app_log_error file too
+        motion_agent_log_has_message_error = self.error_message in motion_agent_content and self.level_error in motion_agent_content
+        app_log_has_message_error = self.error_message in app_log_content and self.level_error in app_log_content
+        app_log_error_has_message_error = self.error_message in app_log_error_content and self.level_error in app_log_error_content
+
+        # critical level. In this level it is necessary to check app_log_error file too
+        motion_agent_log_has_message_critical = self.critical_message in motion_agent_content and self.level_critical in motion_agent_content
+        app_log_has_message_critical = self.critical_message in app_log_content and self.level_critical in app_log_content
+        app_log_error_has_message_critical = self.critical_message in app_log_error_content and self.level_critical in app_log_error_content
+
+        # Remove log files
+        os.remove(motion_agent_log_path)
+        os.remove(app_log_path)
+        os.remove(app_error_log_path)
+
+        # Check test files logs after deleting
+        exist_motion_agent_log_after_deleting = os.path.isfile(motion_agent_log_path)
+        exist_app_log_after_deleting = os.path.isfile(app_log_path)
+        exist_app_error_log_after_deleting = os.path.isfile(app_error_log_path)
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertTrue(exist_motion_agent_log)
+        self.assertTrue(exist_app_log)
+        self.assertTrue(exist_app_error_log)
+
+        self.assertTrue(motion_agent_log_has_message_info)
+        self.assertTrue(app_log_has_message_info)
+
+        self.assertTrue(motion_agent_log_has_message_warning)
+        self.assertTrue(app_log_has_message_warning)
+
+        self.assertTrue(motion_agent_log_has_message_error)
+        self.assertTrue(app_log_has_message_error)
+        self.assertTrue(app_log_error_has_message_error)
+
+        self.assertTrue(motion_agent_log_has_message_critical)
+        self.assertTrue(app_log_has_message_critical)
+        self.assertTrue(app_log_error_has_message_critical)
+
+        self.assertFalse(exist_motion_agent_log_after_deleting)
+        self.assertFalse(exist_app_log_after_deleting)
+        self.assertFalse(exist_app_error_log_after_deleting)
+
+        ##############################################################################################
+
+    def test10_object_detector_agent_logging(self):
+        object_detector_agent_logger = MotionAgentLogger(log_path=self.test_path)
+
+        # Make logs
+        object_detector_agent_logger.info(self.info_message)
+        object_detector_agent_logger.warning(self.warning_message)
+        object_detector_agent_logger.error(self.error_message)
+        object_detector_agent_logger.critical(self.critical_message)
+
+        # Path logs
+        object_detector_agent_log_path = self.test_path + "/" + object_detector_agent_logger.logger_name + ".log"
+        app_log_path = self.test_path + "/" + app_file_log
+        app_error_log_path = self.test_path + "/" + app_file_log_error
+
+        # Check if files exist
+        exist_object_detector_agent_log = os.path.isfile(object_detector_agent_log_path)
+        exist_app_log = os.path.isfile(app_log_path)
+        exist_app_error_log = os.path.isfile(app_error_log_path)
+
+        # Read files
+        f_1 = open(object_detector_agent_log_path, "r")
+        object_detector_agent_content = f_1.read()
+        f_1.close()
+
+        f_2 = open(app_log_path, "r")
+        app_log_content = f_2.read()
+        f_2.close()
+
+        f_3 = open(app_error_log_path, "r")
+        app_log_error_content = f_3.read()
+        f_3.close()
+
+        # Check if log files have the messages content
+
+        # info level
+        object_detector_agent_log_has_message_info = self.info_message in object_detector_agent_content and self.level_info in object_detector_agent_content
+        app_log_has_message_info = self.info_message in app_log_content and self.level_info in app_log_content
+
+        # warning level
+        object_detector_agent_log_has_message_warning = self.warning_message in object_detector_agent_content and self.level_warning in object_detector_agent_content
+        app_log_has_message_warning = self.warning_message in app_log_content and self.level_warning in app_log_content
+
+        # level error. In this level it is necessary to check app_log_error file too
+        object_detector_agent_log_has_message_error = self.error_message in object_detector_agent_content and self.level_error in object_detector_agent_content
+        app_log_has_message_error = self.error_message in app_log_content and self.level_error in app_log_content
+        app_log_error_has_message_error = self.error_message in app_log_error_content and self.level_error in app_log_error_content
+
+        # critical level. In this level it is necessary to check app_log_error file too
+        object_detector_agent_log_has_message_critical = self.critical_message in object_detector_agent_content and self.level_critical in object_detector_agent_content
+        app_log_has_message_critical = self.critical_message in app_log_content and self.level_critical in app_log_content
+        app_log_error_has_message_critical = self.critical_message in app_log_error_content and self.level_critical in app_log_error_content
+
+        # Remove log files
+        os.remove(object_detector_agent_log_path)
+        os.remove(app_log_path)
+        os.remove(app_error_log_path)
+
+        # Check test files logs after deleting
+        exist_object_detector_agent_log_after_deleting = os.path.isfile(object_detector_agent_log_path)
+        exist_app_log_after_deleting = os.path.isfile(app_log_path)
+        exist_app_error_log_after_deleting = os.path.isfile(app_error_log_path)
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertTrue(exist_object_detector_agent_log)
+        self.assertTrue(exist_app_log)
+        self.assertTrue(exist_app_error_log)
+
+        self.assertTrue(object_detector_agent_log_has_message_info)
+        self.assertTrue(app_log_has_message_info)
+
+        self.assertTrue(object_detector_agent_log_has_message_warning)
+        self.assertTrue(app_log_has_message_warning)
+
+        self.assertTrue(object_detector_agent_log_has_message_error)
+        self.assertTrue(app_log_has_message_error)
+        self.assertTrue(app_log_error_has_message_error)
+
+        self.assertTrue(object_detector_agent_log_has_message_critical)
+        self.assertTrue(app_log_has_message_critical)
+        self.assertTrue(app_log_error_has_message_critical)
+
+        self.assertFalse(exist_object_detector_agent_log_after_deleting)
+        self.assertFalse(exist_app_log_after_deleting)
+        self.assertFalse(exist_app_error_log_after_deleting)
+
+    ##############################################################################################
+
+    def test11_photo_logging(self):
+
+        # Make logs
+        self.logger.info(self.info_message)
+        self.logger.warning(self.warning_message)
+        self.logger.error(self.error_message)
+        self.logger.critical(self.critical_message)
 
         # Path logs
         photo_log_path = self.test_path + "/" + self.logger.logger_name + ".log"
@@ -448,22 +605,22 @@ class TestLoggerModule(unittest.TestCase):
         # Check if log files have the messages content
 
         # info level
-        photo_log_has_message_info = info_message in photo_log_content and level_info in photo_log_content
-        app_log_has_message_info = info_message in app_log_content and level_info in app_log_content
+        photo_log_has_message_info = self.info_message in photo_log_content and self.level_info in photo_log_content
+        app_log_has_message_info = self.info_message in app_log_content and self.level_info in app_log_content
 
         # warning level
-        photo_log_has_message_warning = warning_message in photo_log_content and level_warning in photo_log_content
-        app_log_has_message_warning = warning_message in app_log_content and level_warning in app_log_content
+        photo_log_has_message_warning = self.warning_message in photo_log_content and self.level_warning in photo_log_content
+        app_log_has_message_warning = self.warning_message in app_log_content and self.level_warning in app_log_content
 
         # level error. In this level it is necessary to check app_log_error file too
-        photo_log_has_message_error = error_message in photo_log_content and level_error in photo_log_content
-        app_log_has_message_error = error_message in app_log_content and level_error in app_log_content
-        app_log_error_has_message_error = error_message in app_log_error_content and level_error in app_log_error_content
+        photo_log_has_message_error = self.error_message in photo_log_content and self.level_error in photo_log_content
+        app_log_has_message_error = self.error_message in app_log_content and self.level_error in app_log_content
+        app_log_error_has_message_error = self.error_message in app_log_error_content and self.level_error in app_log_error_content
 
         # critical level. In this level it is necessary to check app_log_error file too
-        photo_log_has_message_critical = critical_message in photo_log_content and level_critical in photo_log_content
-        app_log_has_message_critical = critical_message in app_log_content and level_critical in app_log_content
-        app_log_error_has_message_critical = critical_message in app_log_error_content and level_critical in app_log_error_content
+        photo_log_has_message_critical = self.critical_message in photo_log_content and self.level_critical in photo_log_content
+        app_log_has_message_critical = self.critical_message in app_log_content and self.level_critical in app_log_content
+        app_log_error_has_message_critical = self.critical_message in app_log_error_content and self.level_critical in app_log_error_content
 
         # Remove log files
         os.remove(photo_log_path)
