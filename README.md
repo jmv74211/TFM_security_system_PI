@@ -52,3 +52,25 @@ When we talk about raspberry PI, we mean the set of elements necessary for it to
 <p align="center">
   <img src="https://raw.githubusercontent.com/jmv74211/TFM_security_system_PI/master/doc/images/raspberry_place.png">
 </p>
+
+## 2.2 Backend application
+
+The backend application is in charge of interacting with the set of modules and hardware components to be able to manage 
+them in a very comfortable way from a few simple requests to the API restful.
+
+The backend application consists of a series of agents and modules. You can see more information [here](https://github.com/jmv74211/TFM_security_system_PI/tree/master/backend_app).
+
+### 2.2.1 Backend installation dependencies
+
+In order to install the backend application correctly, it is necessary to install a set of dependencies. 
+
+You can see all this process in detail [here](https://github.com/jmv74211/TFM_security_system_PI/blob/master/doc/installation/backend_installation_guide.md).
+
+# 3. API documentation
+
+The backend application is very easy to use. It basically consists of an agent that controls a restful API. 
+Through this agent, we will be able to manage the set of modules of the application, since we will be able to start 
+other agents, stop them, perform tasks such as taking photos or recording videos, start the streaming service...
+
+You can see all the related information in [this documentation](https://github.com/jmv74211/TFM_security_system_PI/tree/master/doc/api)
+
