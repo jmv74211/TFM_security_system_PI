@@ -1,6 +1,6 @@
 # API agent documentation
 
-**API AGENT:** Receives requests and interacts with the rest of system elements .
+Receives requests and interacts with the rest of system elements .
 
 Below are the set of requests that can be made to this API and the values it returns.
 
