@@ -68,4 +68,6 @@ DETECTOR_AGENT_RUNNING_PORT = 11000
 # Detector agent status, default False. To activate it, change its value to True
 DETECTOR_AGENT_STATUS = True
 
+##################    TELEGRAM BOT  ##################
 
+TELEGRAM_CONFIG_PATH = os.path.join(ROOT_DIR, 'config', 'telegram_config.yml')
