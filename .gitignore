@@ -105,9 +105,6 @@ venv.bak/
 # Pycharm
 .idea
 
-# Test production file
-prueba.py
-
 # Logs folder
 logs
 
@@ -117,3 +114,6 @@ htmlcov
 
 # Celery database
 *.sqlite
+
+# Private telegram configuration
+telegram_config.yml

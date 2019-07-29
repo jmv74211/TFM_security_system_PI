@@ -398,3 +398,14 @@ class DetectorObjectAgentLogger(Logger):
         super().__init__(logger_name, log_path)
 
 ##############################################################################################
+
+"""
+    Telegram bot agent
+"""
+
+class TelegramBotAgentLogger(Logger):
+
+    def __init__(self, logger_name="telegram_bot_agent", log_path=config_log_path):
+        super().__init__(logger_name, log_path)
+
+##############################################################################################
