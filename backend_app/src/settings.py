@@ -56,7 +56,17 @@ MOTION_AGENT_CELERY_BACKEND = 'db+sqlite:///motion_agent_celery.sqlite'
 
 ##################    STREAMING SERVER  ##################
 
+STREAMING_SERVER_IP_ADDRESS = "http://192.168.1.100"
+
 STREAMING_SERVER_PATH = os.path.join(ROOT_DIR, 'modules', 'pistream', 'streaming_server.py')
+
+STREAMING_SERVER_PORT = 8082
+
+STREAMING_WIDTH = 1024
+
+STREAMING_HEIGHT = 768
+
+STREAMING_FRAME_RATE = 24
 
 ##################    DETECTOR_AGENT  ##################
 
