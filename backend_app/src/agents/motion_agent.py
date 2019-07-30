@@ -85,6 +85,7 @@ class CallbackTask(celery.Task):
                 logger.debug("Person detected, sending request to API agent to generate an alert")
                 # Generate an alert in API agent
                 generate_api_agent_alert.apply_async(args=args, queue='motion_agent')
+                return
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         logger.error("Error while processing send_object_detector_agent_request task ")
@@ -149,21 +150,21 @@ def send_object_detector_agent_request(file_path):
     
 """
 
-@celery.task(name="generate_api_agent_alert", base=CallbackTask)
+@celery.task(name="generate_api_agent_alert")
 def generate_api_agent_alert(args):
     headers = {'content-type': 'application/json'}
     logger.debug("FILE_PATH = " + repr(args))
     payload = {'user': user, 'password': password, 'file_path': args}
-    request_sended = False
+    request_sent = False
     try:
         requests.post(main_agent_host + "/api/motion_agent/generate_alert", json=payload, headers=headers)
-        request_sended = True
+        request_sent = True
     except:
         logger.error(
             "Error while trying to send an alert to API agent with address {}.¿It is running?".format(
                 main_agent_host))
 
-    return request_sended
+    return request_sent
 ##############################################################################################
 
 if __name__ == "__main__":
@@ -203,7 +204,7 @@ if __name__ == "__main__":
             headers = {'content-type': 'application/json'}
 
             # If detector agent is enabled, filter the image and generate an alert if there is a person in the photo
-            if settings.DETECTOR_AGENT_STATUS:
+            if settings.DETECTOR_AGENT_STATUS and motion_agent_mode == "photo":
                 argument_list = [file_path]
                 send_object_detector_agent_request.apply_async(args=argument_list, queue='motion_agent')
             # If detector agent is disabled, generate an alert
