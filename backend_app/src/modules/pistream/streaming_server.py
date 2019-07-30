@@ -25,10 +25,10 @@ import settings
 ###########################################
 # CONFIGURATION
 
-WIDTH = 1024
-HEIGHT = 768
-FRAMERATE = 24
-HTTP_PORT = 8082
+WIDTH = settings.STREAMING_WIDTH
+HEIGHT = settings.STREAMING_HEIGHT
+FRAMERATE = settings.STREAMING_FRAME_RATE
+HTTP_PORT = settings.STREAMING_SERVER_PORT
 WS_PORT = 8084
 COLOR = u'#444'
 BGCOLOR = u'#333'
