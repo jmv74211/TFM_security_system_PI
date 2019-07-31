@@ -479,7 +479,7 @@ class TestLoggerModule(unittest.TestCase):
         self.assertFalse(exist_app_log_after_deleting)
         self.assertFalse(exist_app_error_log_after_deleting)
 
-        ##############################################################################################
+    ##############################################################################################
 
     def test10_object_detector_agent_logging(self):
         object_detector_agent_logger = MotionAgentLogger(log_path=self.test_path)
@@ -571,7 +571,97 @@ class TestLoggerModule(unittest.TestCase):
 
     ##############################################################################################
 
-    def test11_photo_logging(self):
+    def test11_telegram_bot_logging(self):
+        telegram_bot_logger = TelegramBotAgentLogger(log_path=self.test_path)
+
+        # Make logs
+        telegram_bot_logger.info(self.info_message)
+        telegram_bot_logger.warning(self.warning_message)
+        telegram_bot_logger.error(self.error_message)
+        telegram_bot_logger.critical(self.critical_message)
+
+        # Path logs
+        telegram_bot_log_path = self.test_path + "/" + telegram_bot_logger.logger_name + ".log"
+        app_log_path = self.test_path + "/" + app_file_log
+        app_error_log_path = self.test_path + "/" + app_file_log_error
+
+        # Check if files exist
+        exist_telegram_bot_log = os.path.isfile(telegram_bot_log_path)
+        exist_app_log = os.path.isfile(app_log_path)
+        exist_app_error_log = os.path.isfile(app_error_log_path)
+
+        # Read files
+        f_1 = open(telegram_bot_log_path, "r")
+        telegram_bot_content = f_1.read()
+        f_1.close()
+
+        f_2 = open(app_log_path, "r")
+        app_log_content = f_2.read()
+        f_2.close()
+
+        f_3 = open(app_error_log_path, "r")
+        app_log_error_content = f_3.read()
+        f_3.close()
+
+        # Check if log files have the messages content
+
+        # info level
+        telegram_bot_log_has_message_info = self.info_message in telegram_bot_content and self.level_info in telegram_bot_content
+        app_log_has_message_info = self.info_message in app_log_content and self.level_info in app_log_content
+
+        # warning level
+        telegram_bot_log_has_message_warning = self.warning_message in telegram_bot_content and self.level_warning in telegram_bot_content
+        app_log_has_message_warning = self.warning_message in app_log_content and self.level_warning in app_log_content
+
+        # level error. In this level it is necessary to check app_log_error file too
+        telegram_bot_log_has_message_error = self.error_message in telegram_bot_content and self.level_error in telegram_bot_content
+        app_log_has_message_error = self.error_message in app_log_content and self.level_error in app_log_content
+        app_log_error_has_message_error = self.error_message in app_log_error_content and self.level_error in app_log_error_content
+
+        # critical level. In this level it is necessary to check app_log_error file too
+        telegram_bot_log_has_message_critical = self.critical_message in telegram_bot_content and self.level_critical in telegram_bot_content
+        app_log_has_message_critical = self.critical_message in app_log_content and self.level_critical in app_log_content
+        app_log_error_has_message_critical = self.critical_message in app_log_error_content and self.level_critical in app_log_error_content
+
+        # Remove log files
+        os.remove(telegram_bot_log_path)
+        os.remove(app_log_path)
+        os.remove(app_error_log_path)
+
+        # Check test files logs after deleting
+        exist_object_detector_agent_log_after_deleting = os.path.isfile(telegram_bot_log_path)
+        exist_app_log_after_deleting = os.path.isfile(app_log_path)
+        exist_app_error_log_after_deleting = os.path.isfile(app_error_log_path)
+
+        # ----------------------------------------------------------------------------------------#
+        #                                     CHECKS                                              #
+        # ----------------------------------------------------------------------------------------#
+
+        self.assertTrue(exist_telegram_bot_log)
+        self.assertTrue(exist_app_log)
+        self.assertTrue(exist_app_error_log)
+
+        self.assertTrue(telegram_bot_log_has_message_info)
+        self.assertTrue(app_log_has_message_info)
+
+        self.assertTrue(telegram_bot_log_has_message_warning)
+        self.assertTrue(app_log_has_message_warning)
+
+        self.assertTrue(telegram_bot_log_has_message_error)
+        self.assertTrue(app_log_has_message_error)
+        self.assertTrue(app_log_error_has_message_error)
+
+        self.assertTrue(telegram_bot_log_has_message_critical)
+        self.assertTrue(app_log_has_message_critical)
+        self.assertTrue(app_log_error_has_message_critical)
+
+        self.assertFalse(exist_object_detector_agent_log_after_deleting)
+        self.assertFalse(exist_app_log_after_deleting)
+        self.assertFalse(exist_app_error_log_after_deleting)
+
+    ##############################################################################################
+
+    def test12_photo_logging(self):
 
         # Make logs
         self.logger.info(self.info_message)
