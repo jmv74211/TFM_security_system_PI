@@ -7,6 +7,7 @@ import settings
 import yaml
 import sys
 import time
+import os
 from modules.photo import Photo
 from modules.video import Video
 from agents.api_agent import read_photo_configuration, read_video_configuration
@@ -72,7 +73,9 @@ celery = make_celery(app)
 ##############################################################################################
 
 """
-    Callback task class to process the object detector agent response
+    Callback task class to process the object detector agent response. If a person has been 
+    detected, then it generates an alert in api agent, otherwise it will move the image to 
+    false positive alerts.
 """
 
 class CallbackTask(celery.Task):
@@ -85,13 +88,43 @@ class CallbackTask(celery.Task):
                 logger.debug("Person detected, sending request to API agent to generate an alert")
                 # Generate an alert in API agent
                 generate_api_agent_alert.apply_async(args=args, queue='motion_agent')
-                return
+            else:
+                file_path = args[0]
+                try:
+                    move_photo_to_false_positive_alerts(file_path)
+                    logger.debug("Photo has been moved to false positive alerts")
+                except:
+                    return
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        logger.error("Error while processing send_object_detector_agent_request task ")
+        logger.error("Error while processing send_object_detector_agent_request task")
 
 
 ##############################################################################################
+
+""" 
+    Method to move a photo to false positive alerts in case of detector agent says that there is not a person 
+    in the picture.
+"""
+
+
+def move_photo_to_false_positive_alerts(file_path):
+
+    # To get the name of the photo, I'm going to make a split and keep the last part which is the name
+    text_split = file_path.split("/")
+    photo_name = text_split[len(text_split)-1]
+
+    destination_file = os.path.join(settings.FALSE_POSITIVE_ALERTS_FILES_PATH, photo_name)
+
+    try:
+        os.rename(file_path, destination_file)
+        logger.debug("Photo file has been moved to false positive alerts")
+    except:
+        logger.error("Photo {} could not be moved to {}".format(file_path, destination_file))
+        raise
+
+##############################################################################################
+
 
 """ Method to detect if there is a person in a list
     
@@ -146,8 +179,7 @@ def send_object_detector_agent_request(file_path):
 
 
 """ 
-    Async task to generate an alert to API agent
-    
+    Async task to generate an alert to API agent 
 """
 
 @celery.task(name="generate_api_agent_alert")
