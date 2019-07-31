@@ -6,8 +6,8 @@ from functools import wraps  # Import to use decoration functions
 import yaml  # Import to read the configuration file
 import settings  # Import to read configuration info
 from modules.logger import TelegramBotAgentLogger
-import os # Joins path
-import re # regex
+import os  # Joins path
+import re  # regex
 
 ##############################################################################################
 
@@ -54,6 +54,12 @@ print("Bot is running!")
 
 ##############################################################################################
 
+##############################################################################################
+#                                                                                            #
+#                               SUPPORT API FUNCTIONS                                        #
+#                                                                                            #
+##############################################################################################
+
 
 """
     Function to check if the user has permission to access, checking the message.from_user.id
@@ -90,8 +96,10 @@ def authtentication_required(f):
 
 ##############################################################################################
 
-"""
-    Function to get parameter arguments
+""" Function to get parameter arguments
+
+Returns arguments list.
+
 """
 
 
@@ -101,8 +109,10 @@ def extract_arg(arg):
 
 ##############################################################################################
 
-"""
-    Function to get a file time
+""" Function to get a file time
+
+Returns:  Datetime info. Example: (2019-07-30__11:04:21)
+
 """
 
 
@@ -129,64 +139,12 @@ def get_file_datetime(filename):
 
 ##############################################################################################
 
-def check_motion_agent_status():
-    payload = {'user': api_agent_user, 'password': api_agent_password}
-
-    try:
-        check_motion_agent_status_request = requests.get(main_agent_host + "/api/motion_agent/check_status", json=payload)
-        check_motion_agent_status_response = check_motion_agent_status_request.json()
-        motion_agent_status = check_motion_agent_status_response['status']
-    except:
-        logger.error(
-            "[agent: telegram_bot]: Error when sending request to check motion agent status. Status code = {}"
-                .format(check_motion_agent_status_request.status_code))
-        motion_agent_status = None
-
-    return motion_agent_status
-
-
-##############################################################################################
-
-"""
-    Function to modify detector agent status in settings file.
+""" 
+    Function to send a photo to telegram chat
 """
 
-
-def update_detector_agent_status_settings_file(detector_agent_status):
-    settings_file_path = os.path.join(settings.ROOT_DIR, 'settings.py')
-    ok = True
-
-    try:
-        f = open(settings_file_path, mode='r')
-        data = f.read()
-    except:
-        logger.error("[agent: telegram_bot: update_detector_agent_status_settings_file]: Could not read the settings file data")
-        ok = False
-    finally:
-        f.close()
-
-    if detector_agent_status:
-        settings.DETECTOR_AGENT_STATUS = False
-        data = re.sub(r'DETECTOR_AGENT_STATUS = (\w*)', "DETECTOR_AGENT_STATUS = False", data)
-    else:
-        settings.DETECTOR_AGENT_STATUS = True
-        data = re.sub(r'DETECTOR_AGENT_STATUS = (\w*)', "DETECTOR_AGENT_STATUS = True", data)
-
-    try:
-        f = open(settings_file_path, mode='w')
-        f.write(data)
-    except:
-        logger.error("[agent: telegram_bot: update_detector_agent_status_settings_file]: Could not write the settings file data")
-        ok = False
-    finally:
-        f.close()
-
-    return ok
-
-##############################################################################################
 
 def send_photo(chat_id, file_path):
-
     try:
         photo = open(file_path, 'rb')
 
@@ -198,6 +156,12 @@ def send_photo(chat_id, file_path):
     finally:
         photo.close()
 
+
+##############################################################################################
+
+""" 
+    Function to send a video to telegram chat
+"""
 
 
 def send_video(chat_id, file_path):
@@ -212,6 +176,203 @@ def send_video(chat_id, file_path):
     finally:
         video.close()
 
+
+##############################################################################################
+
+""" 
+    Function to activate streaming server
+"""
+
+
+def activate_streaming_server():
+    payload = {'user': api_agent_user, 'password': api_agent_password}
+
+    try:
+        deactivate_streaming_server_request = requests.post(main_agent_host + "/api/streaming/activate", json=payload)
+        if deactivate_streaming_server_request.status_code != 200:  # OK
+            raise
+        logger.debug("Streaming server activated successfully")
+    except:
+        logger.error("[agent: telegram_bot]: Error when activating streaming mode. Status code = {}"
+                     .format(deactivate_streaming_server_request.status_code))
+        raise
+
+
+#############################################################################################
+
+""" 
+    Function to deactivate streaming server
+"""
+
+
+def deactivate_streaming_server():
+    payload = {'user': api_agent_user, 'password': api_agent_password}
+
+    try:
+        deactivate_streaming_server_request = requests.post(main_agent_host + "/api/streaming/deactivate", json=payload)
+
+        if deactivate_streaming_server_request.status_code != 200:  # OK
+            raise
+        logger.debug("Streaming server deactivated successfully")
+    except:
+        logger.error("[agent: telegram_bot]: Error when deactivating streaming mode. Status code = {}"
+                     .format(deactivate_streaming_server_request.status_code))
+        raise
+
+
+##############################################################################################
+
+""" 
+    Function to activate motion agent
+"""
+
+
+def activate_motion_agent():
+    payload = {'user': api_agent_user, 'password': api_agent_password}
+
+    try:
+        activate_motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/activate", json=payload)
+        if activate_motion_agent_request.status_code != 200:  # OK
+            raise
+        logger.debug("Motion agent activated successfully")
+    except:
+        logger.error("[agent: telegram_bot]: Error when activating motion agent. Status code = {}"
+                     .format(activate_motion_agent_request.status_code))
+        raise
+
+
+##############################################################################################
+
+""" 
+    Function to deactivate motion agent
+"""
+
+
+def deactivate_motion_agent():
+    payload = {'user': api_agent_user, 'password': api_agent_password}
+
+    try:
+        deactivate_motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/deactivate", json=payload)
+        if deactivate_motion_agent_request.status_code != 200:  # OK
+            raise
+        logger.debug("Motion agent deactivated successfully")
+    except:
+        logger.error("[agent: telegram_bot]: Error when deactivating motion agent. Status code = {}"
+                     .format(deactivate_motion_agent_request.status_code))
+        raise
+
+
+##############################################################################################
+
+""" Function to check if there is an alert in api agent.
+    
+Returns: Tuple with alert value and file path. If there is not an alert, then will returns (False, ''), 
+otherwise will returns (True,'/home/...')
+
+"""
+
+
+def check_api_agent_alert():
+    payload = {'user': api_agent_user, 'password': api_agent_password}
+
+    file_path = ''
+
+    try:
+        check_motion_agent_request = requests.get(main_agent_host + "/api/motion_agent/check_alert", json=payload)
+
+        check_motion_agent_data_response = check_motion_agent_request.json()
+
+        alert = check_motion_agent_data_response['alert']
+
+        if alert:
+            try:
+                file_path = check_motion_agent_data_response['file_path']
+                logger.debug("A motion agent alert has occurred with file path: {}".format(file_path))
+            except:
+                logger.error(
+                    "[agent: telegram_bot]: Error could not read file path data from api agent alert. Status code = {}".
+                        format(check_motion_agent_request.status_code))
+                raise
+
+    except:
+        logger.error("[agent: telegram_bot]: Error when checking api agent alert. Status code = {}".
+                     format(check_motion_agent_request.status_code))
+        raise
+
+    return (alert, file_path)
+
+
+##############################################################################################
+
+""" Function to check the motion agent status
+
+Returns: True if it is enabled, False if not and None if a error has occurred.  
+
+"""
+
+
+def check_motion_agent_status():
+    payload = {'user': api_agent_user, 'password': api_agent_password}
+
+    try:
+        check_motion_agent_status_request = requests.get(main_agent_host + "/api/motion_agent/check_status",
+                                                         json=payload)
+        check_motion_agent_status_response = check_motion_agent_status_request.json()
+        motion_agent_status = check_motion_agent_status_response['status']
+    except:
+        logger.error(
+            "[agent: telegram_bot]: Error when sending request to check motion agent status. Status code = {}"
+                .format(check_motion_agent_status_request.status_code))
+        motion_agent_status = None
+
+    return motion_agent_status
+
+
+##############################################################################################
+
+""" Function to modify detector agent status in settings file.
+
+Returns: True if it has been updated successfully, False otherwise.
+
+"""
+
+
+def update_detector_agent_status_settings_file(detector_agent_status):
+    settings_file_path = os.path.join(settings.ROOT_DIR, 'settings.py')
+    ok = True
+
+    try:
+        f = open(settings_file_path, mode='r')
+        data = f.read()
+    except:
+        logger.error(
+            "[agent: telegram_bot: update_detector_agent_status_settings_file]: Could not read the settings file data")
+        ok = False
+    finally:
+        f.close()
+
+    # REGEX to update detector agent status in settings file
+    if detector_agent_status:
+        settings.DETECTOR_AGENT_STATUS = False
+        data = re.sub(r'DETECTOR_AGENT_STATUS = (\w*)', "DETECTOR_AGENT_STATUS = False", data)
+    else:
+        settings.DETECTOR_AGENT_STATUS = True
+        data = re.sub(r'DETECTOR_AGENT_STATUS = (\w*)', "DETECTOR_AGENT_STATUS = True", data)
+
+    try:
+        f = open(settings_file_path, mode='w')
+        f.write(data)
+    except:
+        logger.error(
+            "[agent: telegram_bot: update_detector_agent_status_settings_file]: Could not write the settings file data")
+        ok = False
+    finally:
+        f.close()
+
+    return ok
+
+
+##############################################################################################
 
 ##############################################################################################
 #                                                                                            #
@@ -298,6 +459,7 @@ def send_photo_bot(message):
         bot.send_message(chat_id,
                          "Error could not take the photo. Please contact with the telegram bot administrator. Status code = {}".format(
                              take_photo_request.status_code))
+        return
 
     while not task_finished:
         try:
@@ -328,8 +490,7 @@ def send_photo_bot(message):
     except:
         logger.error("[agent: telegram_bot]: Could not send the photo, maybe wrong photo file")
         bot.send_message(chat_id, "Sorry, could not send the photo")
-
-
+        return
 
 
 ############################################################################################
@@ -358,10 +519,11 @@ def send_video_bot(message):
         record_time = int(argument_list[0])  # Get the time parameters in seconds
         payload = {'user': api_agent_user, 'password': api_agent_password, 'recordtime': record_time}
     else:
-        payload = {'user': api_agent_password, 'password': api_agent_password}
+        payload = {'user': api_agent_user, 'password': api_agent_password}
 
     bot.send_message(chat_id, "It is going to be recorded a video with {} seconds length".format(record_time))
 
+    # Record video request
     try:
         record_video_request = requests.post(main_agent_host + "/api/record_video", json=payload)
 
@@ -379,7 +541,9 @@ def send_video_bot(message):
         bot.send_message(chat_id,
                          "Error could not record the video. Please contact with the telegram bot administrator. Status code = {}".format(
                              record_video_request.status_code))
+        return
 
+    # Wait until the asynchronous task is finished
     while not task_finished:
         try:
             video_task_result_request = requests.get(main_agent_host + "/api/result/" + record_video_task_id,
@@ -411,21 +575,20 @@ def send_video_bot(message):
         except:
             logger.error("[agent: telegram_bot]: Could not send the video, maybe wrong video file")
             bot.send_message(chat_id, "Sorry, could not send the video")
+            return
 
     else:
         bot.send_message(chat_id, "The video cannot be sent because it weights more than 50MB, but"
                          + " has been stored locally on the server.")
 
 
-
-##############################################################################################
-
-
 ##############################################################################################
 
 """
-    Enable automatic mode. It activates the motion agent and streaming server. IN addition,
-    checks if exist and alert, in that case send a video o photo message.
+    Enable automatic mode. It activates the motion agent and stops streaming or manual mode (If any are currently activated).
+     In addition, checks if exist and alert, in that case send a video o photo message filtered by object detector agent
+    (if its status is enabled in settings file configuration through /detector bot command or editing manually
+    the detector agent status in settings file).
 """
 
 
@@ -441,76 +604,43 @@ def enable_automatic_mode_bot(message):
     if len(argument_list) > 0 and argument_list[0] == "video":
         motion_agent_mode = "video"
 
-    payload = {'user': api_agent_user, 'password': api_agent_password, 'motion_agent_mode': motion_agent_mode}
-
     if mode == "manual" or mode == "streaming":
 
         # If we are in streaming mode, we need to deactivate the streaming server
         if mode == "streaming":
             # request to deactivate the streaming server.
             try:
-                deactivate_streaming_server_request = requests.post(main_agent_host + "/api/streaming/deactivate",
-                                                                    json=payload)
-                if deactivate_streaming_server_request.status_code == 200:  # OK
-                    bot.send_message(chat_id, "Streaming mode deactivated successfully!")
-                else:
-                    logger.error("[agent: telegram_bot]: Error when deactivating streaming mode. Status code = {}")
-                    bot.send_message(chat_id, "Error when deactivating streaming mode. Status code = {}".
-                                     format(deactivate_streaming_server_request.status_code))
+                deactivate_streaming_server()
+                bot.send_message(chat_id, "Streaming mode deactivated successfully!")
             except:
-                logger.error("[agent: telegram_bot]: Error when deactivating streaming mode. Status code = {}")
-                bot.send_message(chat_id, "Error when deactivating streaming mode. Status code = {}".
-                                 format(deactivate_streaming_server_request.status_code))
+                bot.send_message(chat_id, "Error: could not deactivate streaming server")
+                return
 
         mode = "automatic"
 
         # request to activate the motion agent
         try:
-            activate_motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/activate", json=payload)
-
-            if activate_motion_agent_request.status_code != 200:  # OK
-                logger.error("[agent: telegram_bot]: Error. Motion agent can not be activated. Status code = {}") \
-                    .format(activate_motion_agent_request.status_code)
-                bot.send_message(chat_id, "Error. Motion agent can not be activated. Status code = {}".
-                                 format(activate_motion_agent_request.status_code))
-
-            logger.debug("Mode selected: Automatic")
+            activate_motion_agent()
             bot.send_message(chat_id, "Mode selected: Automatic")
-
         except:
-            logger.error("[agent: telegram_bot]: Error when activating motion agent. Status code = {}"
-                         .format(activate_motion_agent_request.status_code))
-            bot.send_message(chat_id, " Error when activating motion agent. Status code = {}".
-                             format(activate_motion_agent_request.status_code))
+            bot.send_message(chat_id, "Error: could not activate automatic mode")
+            return
+
     else:
         logger.debug("You are already in automatic mode")
         bot.send_message(chat_id, "You are already in automatic mode")
 
     while mode == "automatic":
         # request to check if there is a motion agent alert
-        file_path = ''
         try:
-            check_motion_agent_request = requests.get(main_agent_host + "/api/motion_agent/check_alert", json=payload)
-
-            check_motion_agent_data_response = check_motion_agent_request.json()
-
-            alert = check_motion_agent_data_response['alert']
+            # Tuple
+            alert, file_path = check_api_agent_alert()  # TENGO QUE GUARDAR TAMBIÉN FILE_PATH DE LA ALERTA
         except:
-            logger.error("[agent: telegram_bot]: Error api agent does not response. Status code = {}".
-                         format(check_motion_agent_request.status_code))
-            bot.send_message(chat_id,
-                             "Error, API agent does not response and automatic mode could not be enabled. Status code = {} "
-                             .format(check_motion_agent_request.status_code))
+            bot.send_message(chat_id, "Error, could not check if there is an alert in api agent")
             return
 
+        # If alert is true, then send photo or video file
         if alert == True:
-            logger.debug("ALERT!")
-
-            try:
-                file_path = check_motion_agent_data_response['file_path']
-            except:
-                logger.error("[agent: telegram_bot]: Error, could not read file path from api agent alert")
-                return
 
             if motion_agent_mode == "photo":
                 try:
@@ -518,16 +648,21 @@ def enable_automatic_mode_bot(message):
                 except:
                     logger.error("[agent: telegram_bot]: Could not send the photo, maybe wrong photo file")
                     bot.send_message(chat_id, "Sorry, could not send the photo alert")
-            else: # Video mode
-                send_video(chat_id, file_path)
+            else:  # Video mode
+                try:
+                    send_video(chat_id, file_path)
+                except:
+                    logger.error("[agent: telegram_bot]: Could not send the video, maybe wrong video file")
+                    bot.send_message(chat_id, "Sorry, could not send the video alert")
 
+        # Waiting time to check the alert again
         sleep(time_refresh_check_alert)
 
 
 ##############################################################################################
 
 """
-    Enable manual mode. It deactivates the motion agent or streaming server.
+    Enable manual mode. It deactivates streaming or automatic mode (If any are currently activated).
 """
 
 
@@ -536,42 +671,30 @@ def enable_automatic_mode_bot(message):
 def enable_manual_mode_bot(message):
     global mode
     chat_id = message.chat.id
-    payload = {'user': api_agent_user, 'password': api_agent_password}
 
     if mode == "automatic" or mode == "streaming":
 
         if mode == "streaming":
-            # request to deactivate the streaming server.
-            try:
-                deactivate_streaming_server_request = requests.post(main_agent_host + "/api/streaming/deactivate",
-                                                                    json=payload)
-                if deactivate_streaming_server_request.status_code == 200:  # OK
+
+            # If we are in streaming mode, we need to deactivate the streaming server
+            if mode == "streaming":
+                # request to deactivate the streaming server.
+                try:
+                    deactivate_streaming_server()
                     bot.send_message(chat_id, "Streaming mode deactivated successfully!")
-                else:
-                    bot.send_message(chat_id, "Error: Streaming mode can not be deactivated")
-            except:
-                logger.error("[agent: telegram_bot]: Error when deactivating streaming server. Status code = {}"
-                             .format(deactivate_streaming_server_request.status_code))
-                bot.send_message(chat_id, " Error when deactivating streaming server. Status code = {}".
-                                 format(deactivate_streaming_server_request.status_code))
+                except:
+                    bot.send_message(chat_id, "Error: could not deactivate streaming server")
+                    return
 
         elif mode == "automatic":
             # request to deactivate the motion agent.
             try:
-                deactivate_motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/deactivate",
-                                                                json=payload)
-                if deactivate_motion_agent_request.status_code == 200:  # OK
-                    bot.send_message(chat_id, "Automatic mode deactivated successfully!")
-                else:
-                    logger.error("[agent: telegram_bot]: Error, automatic mode can not be deactivated. Status code = {}"
-                                 .format(deactivate_motion_agent_request.status_code))
-                    bot.send_message(chat_id, "Error: Automatic mode can not be deactivated. Status code = {}".
-                                     format(deactivate_motion_agent_request.status_code))
+                deactivate_motion_agent()
+                bot.send_message(chat_id, "Automatic mode deactivated successfully!")
             except:
-                logger.error("[agent: telegram_bot]: Error when deactivating motion agent. Status code = {}"
-                             .format(deactivate_motion_agent_request.status_code))
-                bot.send_message(chat_id, " Error when deactivating motion agent. Status code = {}".
-                                 format(deactivate_motion_agent_request.status_code))
+                bot.send_message(chat_id, "Error: could not deactivate automatic mode (motion agent)")
+                return
+
         mode = "manual"
         logger.debug("Mode selected: Manual")
         bot.send_message(chat_id, "Mode selected: Manual")
@@ -582,7 +705,7 @@ def enable_manual_mode_bot(message):
 ##############################################################################################
 
 """
-    Enable streaming mode. It deactivates the motion agent.
+    Enable streaming mode. It deactivates manual or automatic mode (If any are currently activated).
 """
 
 
@@ -591,54 +714,32 @@ def enable_manual_mode_bot(message):
 def enable_streaming_mode_bot(message):
     global mode
     chat_id = message.chat.id
-    payload = {'user': api_agent_user, 'password': api_agent_password}
 
     if mode == "automatic" or mode == "manual":
 
         if mode == "automatic":
             # request to deactivate the motion agent.
             try:
-                deactivate_motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/deactivate",
-                                                                json=payload)
-                if deactivate_motion_agent_request.status_code == 200:  # OK
-                    bot.send_message(chat_id, "Automatic mode deactivated successfully!")
-                else:
-                    logger.error("[agent: telegram_bot]: Error when deactivating motion agent. Status code = {}"
-                                 .format(deactivate_motion_agent_request.status_code))
-                    bot.send_message(chat_id, "Error: Automatic mode can not be deactivated. Status code = {}"
-                                     .format(deactivate_motion_agent_request.status_code))
+                deactivate_motion_agent()
+                bot.send_message(chat_id, "Automatic mode deactivated successfully!")
             except:
-                logger.error(
-                    "[agent: telegram_bot]: Error when sending request to deactivate motion agent. Status code = {}"
-                        .format(deactivate_motion_agent_request.status_code))
-                bot.send_message(chat_id, "Error: Automatic mode can not be deactivated. Status code = {}"
-                                 .format(deactivate_motion_agent_request.status_code))
+                bot.send_message(chat_id, "Error: could not deactivate automatic mode (motion agent)")
+                return
 
         mode = "streaming"
 
+        # request to deactivate the motion agent.
         try:
-            activate_streaming_server_request = requests.post(main_agent_host + "/api/streaming/activate", json=payload)
-            if activate_streaming_server_request.status_code == 200:  # OK
-                streaming = settings.STREAMING_SERVER_IP_ADDRESS + ":" + repr(settings.STREAMING_SERVER_PORT)
-                bot.send_message(chat_id, "Mode selected: Streaming. Watch it here --> " + streaming)
-                logger.debug("Mode selected: Streaming")
-            else:
-                bot.send_message(chat_id, "Error: Streaming mode can not be deactivated. Status code = {}"
-                                 .format(activate_streaming_server_request.status_code))
-                logger.error(
-                    "[agent: telegram_bot]: Error when sending request to activate streaming server. Status code = {}"
-                        .format(activate_streaming_server_request.status_code))
-                bot.send_message(chat_id, "Error: Automatic mode can not be deactivated. Status code = {}"
-                                 .format(activate_streaming_server_request.status_code))
+            activate_streaming_server()
+            streaming_url = settings.STREAMING_SERVER_IP_ADDRESS + ":" + repr(settings.STREAMING_SERVER_PORT)
+            bot.send_message(chat_id, "Mode selected: Streaming. Watch it here --> " + streaming_url)
         except:
-            logger.error(
-                "[agent: telegram_bot]: Error when sending request to activate streaming server. Status code = {}"
-                    .format(activate_streaming_server_request.status_code))
-            bot.send_message(chat_id, "Error: streaming mode can not be deactivated. Status code = {}"
-                             .format(activate_streaming_server_request.status_code))
+            bot.send_message(chat_id, "Error: Streaming mode could not be deactivated (streaming server)")
+            return
+
     elif mode == "streaming":
-        streaming = settings.STREAMING_SERVER_IP_ADDRESS + ":" + repr(settings.STREAMING_SERVER_PORT)
-        bot.send_message(chat_id, "You are already in streaming mode.  Watch it here --> " + streaming)
+        streaming_url = settings.STREAMING_SERVER_IP_ADDRESS + ":" + repr(settings.STREAMING_SERVER_PORT)
+        bot.send_message(chat_id, "You are already in streaming mode.  Watch it here --> " + streaming_url)
 
 
 ##############################################################################################
@@ -663,7 +764,7 @@ def get_mode_bot(message):
 ##############################################################################################
 
 """
-    Activate detector agent mode in motion agent.
+    Activate/Deactivate detector agent mode in motion agent.
 """
 
 
@@ -674,11 +775,11 @@ def toogle_detector_bot(message):
     chat_id = message.chat.id
     detector_status = settings.DETECTOR_AGENT_STATUS
 
-    # Toogle value: True --> False, False --> True
+    # Toogle detector agent status value in settings file: True --> False, False --> True
     update_detector_agent_status_settings_file(detector_status)
 
     # Check if the file has been updated successfully
-    if(detector_status == settings.DETECTOR_AGENT_STATUS):
+    if (detector_status == settings.DETECTOR_AGENT_STATUS):
         logger.error("[agent: telegram_bot]: Error, could not update the detector agent status")
         bot.send_message(chat_id, "Error, could not update the detector agent status")
         return
@@ -686,22 +787,36 @@ def toogle_detector_bot(message):
     # Check motion agent status
     motion_agent_status = check_motion_agent_status()
 
-    if settings.DETECTOR_AGENT_STATUS: #Activated
+    if settings.DETECTOR_AGENT_STATUS:  # Activated
         logger.info("Detector agent has been enabled")
         bot.send_message(chat_id, "Detector agent has been enabled. ")
 
-    else: # Deactivated
+    else:  # Deactivated
         logger.info("Detector agent has been disabled")
         bot.send_message(chat_id, "Detector agent has been disabled")
 
     if motion_agent_status == 'ON':
         bot.send_message(chat_id, "You must disable and enable automatic mode for the changes to take effect")
 
-#
-# ##############################################################################################
-#
+
+##############################################################################################
+
+"""
+    Get current detector agent status
+"""
 
 
+@bot.message_handler(commands=['gdetector'])
+@authtentication_required
+def get_detector_status_bot(message):
+    chat_id = message.chat.id
+    if settings.DETECTOR_AGENT_STATUS:
+        bot.send_message(chat_id, "Detector is enabled")
+    else:
+        bot.send_message(chat_id, "Detector is disabled")
+
+
+##############################################################################################
 
 logger = TelegramBotAgentLogger()
 
