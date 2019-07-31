@@ -15,6 +15,10 @@ PHOTO_FILES_PATH = "/home/jmv74211/Escritorio/security_files/photos"
 VIDEO_FILES_PATH = "/home/jmv74211/Escritorio/security_files/videos"
 ALERTS_FILES_PATH = "/home/jmv74211/Escritorio/security_files/alerts"
 
+# False positive alerts directory: Here it will be saved photo files in which detector agent
+# has not detected a person.
+FALSE_POSITIVE_ALERTS_FILES_PATH = "/home/jmv74211/Escritorio/security_files/alerts/false_positive"
+
 ##################    CONFIGURATION FILES PATH   ##################
 
 # Module configuration file
@@ -76,7 +80,7 @@ DETECTOR_AGENT_IP_ADDRESS = "http://192.168.1.100"
 DETECTOR_AGENT_RUNNING_PORT = 11000
 
 # Detector agent status, default False. To activate it, change its value to True
-DETECTOR_AGENT_STATUS = True
+DETECTOR_AGENT_STATUS = False
 
 ##################    TELEGRAM BOT  ##################
 
