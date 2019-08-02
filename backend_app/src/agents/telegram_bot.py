@@ -75,8 +75,8 @@ def authtentication_required(f):
 
         # White list of allowd users
         allowed_users = {'users':
-                             [{'id': telegram_user_id, 'username': telegram_username}, # Your username and user id
-                              {'id': bot_user_id, 'username': bot_username}, # Telegram bot user and user id
+                             [{'id': telegram_user_id, 'username': telegram_username},  # Your username and user id
+                              {'id': bot_user_id, 'username': bot_username},  # Telegram bot user and user id
                               ]}
         allowed = False
 
@@ -196,8 +196,7 @@ def activate_streaming_server():
             raise
         logger.debug("Streaming server activated successfully")
     except:
-        logger.error("[agent: telegram_bot]: Error when activating streaming mode. Status code = {}"
-                     .format(deactivate_streaming_server_request.status_code))
+        logger.error("[agent: telegram_bot]: Error when activating streaming mode.")
         raise
 
 
@@ -218,8 +217,7 @@ def deactivate_streaming_server():
             raise
         logger.debug("Streaming server deactivated successfully")
     except:
-        logger.error("[agent: telegram_bot]: Error when deactivating streaming mode. Status code = {}"
-                     .format(deactivate_streaming_server_request.status_code))
+        logger.error("[agent: telegram_bot]: Error when deactivating streaming mode.")
         raise
 
 
@@ -239,8 +237,7 @@ def activate_motion_agent():
             raise
         logger.debug("Motion agent activated successfully")
     except:
-        logger.error("[agent: telegram_bot]: Error when activating motion agent. Status code = {}"
-                     .format(activate_motion_agent_request.status_code))
+        logger.error("[agent: telegram_bot]: Error when activating motion agent.")
         raise
 
 
@@ -260,8 +257,7 @@ def deactivate_motion_agent():
             raise
         logger.debug("Motion agent deactivated successfully")
     except:
-        logger.error("[agent: telegram_bot]: Error when deactivating motion agent. Status code = {}"
-                     .format(deactivate_motion_agent_request.status_code))
+        logger.error("[agent: telegram_bot]: Error when deactivating motion agent.")
         raise
 
 
@@ -293,13 +289,11 @@ def check_api_agent_alert():
                 logger.debug("A motion agent alert has occurred with file path: {}".format(file_path))
             except:
                 logger.error(
-                    "[agent: telegram_bot]: Error could not read file path data from api agent alert. Status code = {}".
-                        format(check_motion_agent_request.status_code))
+                    "[agent: telegram_bot]: Error could not read file path data from api agent alert.")
                 raise
 
     except:
-        logger.error("[agent: telegram_bot]: Error when checking api agent alert. Status code = {}".
-                     format(check_motion_agent_request.status_code))
+        logger.error("[agent: telegram_bot]: Error when checking api agent alert.")
         raise
 
     return (alert, file_path)
@@ -324,8 +318,7 @@ def check_motion_agent_status():
         motion_agent_status = check_motion_agent_status_response['status']
     except:
         logger.error(
-            "[agent: telegram_bot]: Error when sending request to check motion agent status. Status code = {}"
-                .format(check_motion_agent_status_request.status_code))
+            "[agent: telegram_bot]: Error when sending request to check motion agent status.")
         motion_agent_status = None
 
     return motion_agent_status
@@ -386,6 +379,7 @@ def update_detector_agent_status_settings_file(detector_agent_status):
 """
     Return telegram user id
 """
+
 
 @bot.message_handler(commands=['id'])
 def get_user_id_bot(message):
@@ -455,12 +449,10 @@ def send_photo_bot(message):
 
     except:
 
-        logger.error("[agent: telegram_bot]: Error while sending take photo request with status code = {}".format(
-            take_photo_request.status_code))
+        logger.error("[agent: telegram_bot]: Error while sending take photo request")
 
         bot.send_message(chat_id,
-                         "Error could not take the photo. Please contact with the telegram bot administrator. Status code = {}".format(
-                             take_photo_request.status_code))
+                         "Error could not take the photo. Please contact with the telegram bot administrator.")
         return
 
     while not task_finished:
@@ -469,12 +461,10 @@ def send_photo_bot(message):
             photo_task_result_response = photo_task_result_request.json()
             task_finished = photo_task_result_response['ready'] == True
         except:
-            logger.error("[agent: telegram_bot]: Error while sending task result request with status code = {}".format(
-                photo_task_result_request.status_code))
+            logger.error("[agent: telegram_bot]: Error while sending task result request")
 
             bot.send_message(chat_id,
-                             "Error could not send the photo. Please contact with the telegram bot administrator. Status code = {}".format(
-                                 photo_task_result_request.status_code))
+                             "Error could not send the photo. Please contact with the telegram bot administrator.")
             return
 
         if task_finished:
@@ -505,11 +495,9 @@ def send_photo_bot(message):
 
 @bot.message_handler(commands=['video'])
 @authtentication_required
-def send_video_bot(message):
+def send_video_bot(message, record_time=10):
     # Extract arguments list command
     argument_list = extract_arg(message.text)
-
-    record_time = 10  # Default record time = 10 seconds
 
     chat_id = message.chat.id
 
@@ -517,7 +505,7 @@ def send_video_bot(message):
 
     video_path = ''
 
-    if len(argument_list) > 0:  # Means that video command has one or more parameters
+    if len(argument_list) > 0 and argument_list[0].isdigit():  # Means that video command has one or more parameters
         record_time = int(argument_list[0])  # Get the time parameters in seconds
         payload = {'user': api_agent_user, 'password': api_agent_password, 'recordtime': record_time}
     else:
@@ -537,12 +525,10 @@ def send_video_bot(message):
 
     except:
 
-        logger.error("[agent: telegram_bot]: Error while sending record video request with status code = {}".format(
-            record_video_request.status_code))
+        logger.error("[agent: telegram_bot]: Error while sending record video request")
 
         bot.send_message(chat_id,
-                         "Error could not record the video. Please contact with the telegram bot administrator. Status code = {}".format(
-                             record_video_request.status_code))
+                         "Error could not record the video. Please contact with the telegram bot administrator.")
         return
 
     # Wait until the asynchronous task is finished
@@ -553,12 +539,10 @@ def send_video_bot(message):
             video_task_result_response = video_task_result_request.json()
             task_finished = video_task_result_response['ready'] == True
         except:
-            logger.error("[agent: telegram_bot]: Error while sending task result request with status code = {}".format(
-                video_task_result_request.status_code))
+            logger.error("[agent: telegram_bot]: Error while sending task result request")
 
             bot.send_message(chat_id,
-                             "Error could not send the video Please contact with the telegram bot administrator. Status code = {}".format(
-                                 video_task_result_request.status_code))
+                             "Error could not send the video Please contact with the telegram bot administrator.")
             return
 
         if task_finished:
@@ -626,10 +610,6 @@ def enable_automatic_mode_bot(message, motion_agent_mode="photo"):
         except:
             bot.send_message(chat_id, "Error: could not activate automatic mode")
             return
-
-    else:
-        logger.debug("You are already in automatic mode")
-        bot.send_message(chat_id, "You are already in automatic mode")
 
     while mode == "automatic":
         # request to check if there is a motion agent alert
@@ -701,8 +681,6 @@ def enable_manual_mode_bot(message):
         mode = "manual"
         logger.debug("Mode selected: Manual")
         bot.send_message(chat_id, "Mode selected: Manual")
-    else:
-        bot.send_message(chat_id, "You are already in manual mode!")
 
 
 ##############################################################################################
@@ -739,10 +717,6 @@ def enable_streaming_mode_bot(message):
         except:
             bot.send_message(chat_id, "Error: Streaming mode could not be deactivated (streaming server)")
             return
-
-    elif mode == "streaming":
-        streaming_url = settings.STREAMING_SERVER_IP_ADDRESS + ":" + repr(settings.STREAMING_SERVER_PORT)
-        bot.send_message(chat_id, "You are already in streaming mode.  Watch it here --> " + streaming_url)
 
 
 ##############################################################################################
@@ -818,16 +792,19 @@ def get_detector_status_bot(message):
     else:
         bot.send_message(chat_id, "Detector is disabled")
 
+
 ##############################################################################################
 
 """
     Start user interface
 """
 
+
 @bot.message_handler(commands=['start'])
 def start_keyboard(message):
     chat_id = message.chat.id
     bot.send_message(chat_id, "Dashboard: Choose one option:", reply_markup=inline_start_keyboard)
+
 
 ##############################################################################################
 
@@ -840,29 +817,29 @@ def start_keyboard(message):
 
 ###############################     MODE KEYBOARD  ##########################################
 
-inline_start_keyboard  = types.InlineKeyboardMarkup()
-inline_start_keyboard_btn1 =  types.InlineKeyboardButton("\u2B50 Mode", callback_data="mode_keyboard")
-inline_start_keyboard_btn2 =  types.InlineKeyboardButton("\U0001F4CC Manage ", callback_data="manage_keyboard")
-inline_start_keyboard_btn3 =  types.InlineKeyboardButton("\U0001F527 Configuration", callback_data="configuration_keyboard")
-inline_start_keyboard_btn4 =  types.InlineKeyboardButton("\U0001F4BB Commands", callback_data="commands_keyboard")
-inline_start_keyboard_btn5 =  types.InlineKeyboardButton("\U0001F4C4 Go to documentation",
-                                                         url="https://github.com/jmv74211/TFM_security_system_PI")
+inline_start_keyboard = types.InlineKeyboardMarkup()
+inline_start_keyboard_btn1 = types.InlineKeyboardButton("\u2B50 Mode", callback_data="mode_keyboard")
+inline_start_keyboard_btn2 = types.InlineKeyboardButton("\U0001F4CC Manage ", callback_data="manage_keyboard")
+inline_start_keyboard_btn3 = types.InlineKeyboardButton("\U0001F527 Configuration",
+                                                        callback_data="configuration_keyboard")
+inline_start_keyboard_btn4 = types.InlineKeyboardButton("\U0001F4BB Commands", callback_data="commands_keyboard")
+inline_start_keyboard_btn5 = types.InlineKeyboardButton("\U0001F4C4 Go to documentation",
+                                                        url="https://github.com/jmv74211/TFM_security_system_PI")
 
 inline_start_keyboard.row(inline_start_keyboard_btn1, inline_start_keyboard_btn2, inline_start_keyboard_btn3)
 inline_start_keyboard.row(inline_start_keyboard_btn4, inline_start_keyboard_btn5)
 
-
 ###############################     MODE KEYBOARD  ##########################################
 
-inline_mode_keyboard  = types.InlineKeyboardMarkup()
-inline_mode_keyboard_btn1 =  types.InlineKeyboardButton("Manual", callback_data="manual_keyboard")
-inline_mode_keyboard_btn2 =  types.InlineKeyboardButton("Automatic", callback_data="automatic_keyboard")
-inline_mode_keyboard_btn3 =  types.InlineKeyboardButton("Streaming", callback_data="configuration_keyboard")
-inline_mode_keyboard_btn4 =  types.InlineKeyboardButton("Get current mode", callback_data="get_mode_keyboard")
-inline_mode_keyboard_btn5 =  types.InlineKeyboardButton("Toggle detector status",
-                                                        callback_data="toggle_detector_status_keyboard")
-inline_mode_keyboard_btn6 =  types.InlineKeyboardButton("Get detector status",
-                                                        callback_data="get_detector_status_keyboard")
+inline_mode_keyboard = types.InlineKeyboardMarkup()
+inline_mode_keyboard_btn1 = types.InlineKeyboardButton("Manual", callback_data="manual_keyboard")
+inline_mode_keyboard_btn2 = types.InlineKeyboardButton("Automatic", callback_data="automatic_keyboard")
+inline_mode_keyboard_btn3 = types.InlineKeyboardButton("Streaming", callback_data="streaming_keyboard")
+inline_mode_keyboard_btn4 = types.InlineKeyboardButton("Get current mode", callback_data="get_mode_keyboard")
+inline_mode_keyboard_btn5 = types.InlineKeyboardButton("Toggle detector status",
+                                                       callback_data="toggle_detector_status_keyboard")
+inline_mode_keyboard_btn6 = types.InlineKeyboardButton("Get detector status",
+                                                       callback_data="get_detector_status_keyboard")
 
 inline_mode_keyboard.row(inline_mode_keyboard_btn1, inline_mode_keyboard_btn2, inline_mode_keyboard_btn3)
 inline_mode_keyboard.row(inline_mode_keyboard_btn4)
@@ -870,27 +847,58 @@ inline_mode_keyboard.row(inline_mode_keyboard_btn5, inline_mode_keyboard_btn6)
 
 ###############################     MANAGE KEYBOARD  #####################################
 
-inline_manage_keyboard  = types.InlineKeyboardMarkup()
-inline_manage_keyboard_btn1 =  types.InlineKeyboardButton("Motion agent", callback_data="motion_agent_keyboard")
-inline_manage_keyboard_btn2 =  types.InlineKeyboardButton("Detector agent", callback_data="detector_agent_keyboard")
+inline_manage_keyboard = types.InlineKeyboardMarkup()
+inline_manage_keyboard_btn1 = types.InlineKeyboardButton("Motion agent", callback_data="motion_agent_keyboard")
+inline_manage_keyboard_btn2 = types.InlineKeyboardButton("Detector agent", callback_data="detector_agent_keyboard")
 
 inline_manage_keyboard.row(inline_manage_keyboard_btn1, inline_manage_keyboard_btn2)
 
 ###############################     CONFIGURATION KEYBOARD  #################################
 
-inline_configuration_keyboard  = types.InlineKeyboardMarkup()
-inline_configuration_keyboard_btn1 =  types.InlineKeyboardButton("Photo", callback_data="photo_configuration_keyboard")
-inline_configuration_keyboard_btn2 =  types.InlineKeyboardButton("Video", callback_data="video_configuration_keyboard")
+inline_configuration_keyboard = types.InlineKeyboardMarkup()
+inline_configuration_keyboard_btn1 = types.InlineKeyboardButton("Photo", callback_data="photo_configuration_keyboard")
+inline_configuration_keyboard_btn2 = types.InlineKeyboardButton("Video", callback_data="video_configuration_keyboard")
 
 inline_configuration_keyboard.row(inline_configuration_keyboard_btn1, inline_configuration_keyboard_btn2)
 
 ###############################     AUTOMATIC KEYBOARD  #################################
 
-inline_automatic_keyboard  = types.InlineKeyboardMarkup()
-inline_automatic_keyboard_btn1 =  types.InlineKeyboardButton("Photo", callback_data="automatic_photo_keyboard")
-inline_automatic_keyboard_btn2 =  types.InlineKeyboardButton("Video", callback_data="automatic_video_keyboard")
+inline_automatic_keyboard = types.InlineKeyboardMarkup()
+inline_automatic_keyboard_btn1 = types.InlineKeyboardButton("Photo", callback_data="automatic_photo_keyboard")
+inline_automatic_keyboard_btn2 = types.InlineKeyboardButton("Video", callback_data="automatic_video_keyboard")
 
 inline_automatic_keyboard.row(inline_automatic_keyboard_btn1, inline_automatic_keyboard_btn2)
+
+###############################     MANUAL KEYBOARD  #################################
+
+inline_manual_keyboard = types.InlineKeyboardMarkup()
+inline_manual_keyboard_btn1 = types.InlineKeyboardButton("Take photo", callback_data="manual_photo_keyboard")
+inline_manual_keyboard_btn2 = types.InlineKeyboardButton("Record video", callback_data="manual_video_keyboard")
+
+inline_manual_keyboard.row(inline_manual_keyboard_btn1, inline_manual_keyboard_btn2)
+
+###############################     MANUAL KEYBOARD  #################################
+
+inline_manual_video_keyboard = types.InlineKeyboardMarkup()
+inline_manual_video_keyboard_btn1 = types.InlineKeyboardButton("5", callback_data="manual_video_5_keyboard")
+inline_manual_video_keyboard_btn2 = types.InlineKeyboardButton("10", callback_data="manual_video_10_keyboard")
+inline_manual_video_keyboard_btn3 = types.InlineKeyboardButton("15", callback_data="manual_video_15_keyboard")
+inline_manual_video_keyboard_btn4 = types.InlineKeyboardButton("20", callback_data="manual_video_20_keyboard")
+inline_manual_video_keyboard_btn5 = types.InlineKeyboardButton("25", callback_data="manual_video_25_keyboard")
+
+inline_manual_video_keyboard.row(inline_manual_video_keyboard_btn1, inline_manual_video_keyboard_btn2,
+                                 inline_manual_video_keyboard_btn3)
+
+inline_manual_video_keyboard.row(inline_manual_video_keyboard_btn4, inline_manual_video_keyboard_btn5)
+
+###############################     STREAMING KEYBOARD  #################################
+
+inline_streaming_keyboard = types.InlineKeyboardMarkup()
+inline_streaming_keyboard_btn1 = types.InlineKeyboardButton("Activate", callback_data="activate_streaming_keyboard")
+inline_streaming_keyboard_btn2 = types.InlineKeyboardButton("Deactivate", callback_data="deactivate_streaming_keyboard")
+
+inline_streaming_keyboard.row(inline_streaming_keyboard_btn1, inline_streaming_keyboard_btn2)
+
 
 ##############################################################################################
 
@@ -898,43 +906,50 @@ inline_automatic_keyboard.row(inline_automatic_keyboard_btn1, inline_automatic_k
 
 @bot.callback_query_handler(lambda query: query.data == "mode_keyboard")
 def mode_keyboard_callback(query):
-  mode_keyboard(query)
+    mode_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "manage_keyboard")
 def manage_keyboard_callback(query):
-  manage_keyboard(query)
+    manage_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "configuration_keyboard")
 def configuration_keyboard_callback(query):
-  configuration_keyboard(query)
+    configuration_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "commands_keyboard")
 def configuration_keyboard_callback(query):
-  commands_keyboard(query)
+    commands_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "get_mode_keyboard")
 def get_mode_keyboard_callback(query):
-  get_mode_keyboard(query)
+    get_mode_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "toggle_detector_status_keyboard")
 def toggle_detector_status_keyboard_callback(query):
-  toggle_detector_status_keyboard(query)
+    toggle_detector_status_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "get_detector_status_keyboard")
 def get_detector_status_keyboard_callback(query):
-  get_detector_status_keyboard(query)
+    get_detector_status_keyboard(query)
+
 
 ##############################################################################################
 
@@ -944,11 +959,13 @@ def mode_keyboard(query):
     chat_id = query.message.chat.id
     bot.send_message(chat_id, "Mode selection: Choose one: ", reply_markup=inline_mode_keyboard)
 
+
 ##############################################################################################
 
 def manage_keyboard(query):
     chat_id = query.message.chat.id
     bot.send_message(chat_id, "Manage selection: Choose one: ", reply_markup=inline_manage_keyboard)
+
 
 ##############################################################################################
 
@@ -956,11 +973,13 @@ def configuration_keyboard(query):
     chat_id = query.message.chat.id
     bot.send_message(chat_id, "Configuration selection: Select one: ", reply_markup=inline_configuration_keyboard)
 
+
 ##############################################################################################
 
 def commands_keyboard(query):
     chat_id = query.message.chat.id
     bot.send_message(chat_id, "Command list: ... ")
+
 
 ##############################################################################################
 
@@ -968,55 +987,64 @@ def commands_keyboard(query):
 
 @bot.callback_query_handler(lambda query: query.data == "manual_keyboard")
 def manual_keyboard_callback(query):
-  manual_keyboard(query)
+    manual_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "automatic_keyboard")
 def automatic_keyboard_callback(query):
-  automatic_keyboard(query)
+    automatic_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "streaming_keyboard")
 def streaming_keyboard_callback(query):
-  streaming_keyboard(query)
+    streaming_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "get_mode_keyboard")
 def get_mode_keyboard_callback(query):
-  get_mode_keyboard(query)
+    get_mode_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "toggle_detector_status_keyboard")
 def toggle_detector_status_keyboard_callback(query):
-  toggle_detector_status_keyboard(query)
+    toggle_detector_status_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "get_detector_status_keyboard")
 def get_detector_status_keyboard_callback(query):
-  get_detector_status_keyboard(query)
+    get_detector_status_keyboard(query)
+
 
 ###############################      MODE FUNCTIONS   #################################
 
 def manual_keyboard(query):
     message = query.message
     enable_manual_mode_bot(message)
+    bot.send_message(message.chat.id, "Choose an action: ", reply_markup=inline_manual_keyboard)
+
 
 ##############################################################################################
 
 def automatic_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Automatic mode: Select resource:", reply_markup= inline_automatic_keyboard)
+    bot.send_message(message.chat.id, "Automatic mode: Select resource:", reply_markup=inline_automatic_keyboard)
+
 
 ##############################################################################################
 
 def streaming_keyboard(query):
     message = query.message
-    get_detector_status_bot(message)
+    enable_streaming_mode_bot(message)
 
 ##############################################################################################
 
@@ -1024,11 +1052,13 @@ def get_mode_keyboard(query):
     message = query.message
     get_mode_bot(message)
 
+
 ##############################################################################################
 
 def toggle_detector_status_keyboard(query):
     message = query.message
     toogle_detector_bot(message)
+
 
 ##############################################################################################
 
@@ -1036,33 +1066,142 @@ def get_detector_status_keyboard(query):
     message = query.message
     get_detector_status_bot(message)
 
+
 ##############################################################################################
 
 ###############################    AUTOMATIC HANDLERS   #################################
 
 @bot.callback_query_handler(lambda query: query.data == "automatic_photo_keyboard")
 def photo_automatic_keyboard_callback(query):
-  automatic_photo_keyboard(query)
+    automatic_photo_keyboard(query)
+
 
 ##############################################################################################
 
 @bot.callback_query_handler(lambda query: query.data == "automatic_video_keyboard")
 def video_automatic_keyboard_callback(query):
-  automatic_video_keyboard(query)
+    automatic_video_keyboard(query)
+
 
 ##############################################################################################
 
-###############################      MODE FUNCTIONS   #################################
+###############################      AUTOMATIC FUNCTIONS   #################################
 
 def automatic_photo_keyboard(query):
     message = query.message
     enable_automatic_mode_bot(message, motion_agent_mode="photo")
+
 
 ##############################################################################################
 
 def automatic_video_keyboard(query):
     message = query.message
     enable_automatic_mode_bot(message, motion_agent_mode="video")
+
+
+##############################################################################################
+
+###############################    MANUAL HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_photo_keyboard")
+def photo_manual_keyboard_callback(query):
+    manual_photo_keyboard(query)
+
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_keyboard")
+def manual_automatic_keyboard_callback(query):
+    manual_video_keyboard(query)
+
+
+##############################################################################################
+
+###############################      MANUAL VIDEO FUNCTIONS   #################################
+
+def manual_photo_keyboard(query):
+    message = query.message
+    send_photo_bot(message)
+
+
+##############################################################################################
+
+def manual_video_keyboard(query):
+    message = query.message
+    bot.send_message(message.chat.id, "Select seconds number", reply_markup=inline_manual_video_keyboard)
+
+
+##############################################################################################
+
+###############################    MANUAL VIDEO HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_5_keyboard")
+def video_manual_5_keyboard_callback(query):
+    video_manual_5_keyboard(query)
+
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_10_keyboard")
+def video_manual_10_keyboard_callback(query):
+    video_manual_10_keyboard(query)
+
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_15_keyboard")
+def video_manual_15_keyboard_callback(query):
+    video_manual_15_keyboard(query)
+
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_20_keyboard")
+def video_manual_20_keyboard_callback(query):
+    video_manual_20_keyboard(query)
+
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_25_keyboard")
+def video_manual_25_keyboard_callback(query):
+    video_manual_25_keyboard(query)
+
+
+##############################################################################################
+
+###############################      MANUAL VIDEO FUNCTIONS   #################################
+
+def video_manual_5_keyboard(query):
+    message = query.message
+    send_video_bot(message, record_time=5)
+
+
+##############################################################################################
+
+def video_manual_10_keyboard(query):
+    message = query.message
+    send_video_bot(message, record_time=10)
+
+##############################################################################################
+
+def video_manual_15_keyboard(query):
+    message = query.message
+    send_video_bot(message, record_time=15)
+
+##############################################################################################
+
+def video_manual_20_keyboard(query):
+    message = query.message
+    send_video_bot(message, record_time=20)
+
+##############################################################################################
+
+def video_manual_25_keyboard(query):
+    message = query.message
+    send_video_bot(message, record_time=25)
+
+##############################################################################################
 
 logger = TelegramBotAgentLogger()
 
