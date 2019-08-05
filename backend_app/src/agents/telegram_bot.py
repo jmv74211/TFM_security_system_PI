@@ -886,61 +886,52 @@ def start_keyboard(message):
 
 inline_start_keyboard = types.InlineKeyboardMarkup()
 inline_start_keyboard_btn1 = types.InlineKeyboardButton("\u2B50 Mode", callback_data="mode_keyboard")
-inline_start_keyboard_btn2 = types.InlineKeyboardButton("\U0001F4CC Manage ", callback_data="manage_keyboard")
-inline_start_keyboard_btn3 = types.InlineKeyboardButton("\U0001F527 Configuration",
+inline_start_keyboard_btn2 = types.InlineKeyboardButton("\U0001F527 Configuration",
                                                         callback_data="configuration_keyboard")
-inline_start_keyboard_btn4 = types.InlineKeyboardButton("\U0001F4BB Commands", callback_data="commands_keyboard")
-inline_start_keyboard_btn5 = types.InlineKeyboardButton("\U0001F4C4 Go to documentation",
+inline_start_keyboard_btn3 = types.InlineKeyboardButton("\U0001F4BB Commands", callback_data="commands_keyboard")
+inline_start_keyboard_btn4 = types.InlineKeyboardButton("\U0001F4C4 Go to documentation",
                                                         url="https://github.com/jmv74211/TFM_security_system_PI")
 
-inline_start_keyboard.row(inline_start_keyboard_btn1, inline_start_keyboard_btn2, inline_start_keyboard_btn3)
-inline_start_keyboard.row(inline_start_keyboard_btn4, inline_start_keyboard_btn5)
+inline_start_keyboard.row(inline_start_keyboard_btn1, inline_start_keyboard_btn2)
+inline_start_keyboard.row(inline_start_keyboard_btn3, inline_start_keyboard_btn4)
 
 ###############################     MODE KEYBOARD  ##########################################
 
 inline_mode_keyboard = types.InlineKeyboardMarkup()
-inline_mode_keyboard_btn1 = types.InlineKeyboardButton("Manual", callback_data="manual_keyboard")
-inline_mode_keyboard_btn2 = types.InlineKeyboardButton("Automatic", callback_data="automatic_keyboard")
-inline_mode_keyboard_btn3 = types.InlineKeyboardButton("Streaming", callback_data="streaming_keyboard")
-inline_mode_keyboard_btn4 = types.InlineKeyboardButton("Get current mode", callback_data="get_mode_keyboard")
-inline_mode_keyboard_btn5 = types.InlineKeyboardButton("Toggle detector status",
+inline_mode_keyboard_btn1 = types.InlineKeyboardButton("\U0001F446 Manual", callback_data="manual_keyboard")
+inline_mode_keyboard_btn2 = types.InlineKeyboardButton("\U0001F4F2 Automatic", callback_data="automatic_keyboard")
+inline_mode_keyboard_btn3 = types.InlineKeyboardButton("\U0001F4BB Streaming", callback_data="streaming_keyboard")
+inline_mode_keyboard_btn4 = types.InlineKeyboardButton("\u27A1 Get current mode", callback_data="get_mode_keyboard")
+inline_mode_keyboard_btn5 = types.InlineKeyboardButton("\u2B55 Toggle detector status",
                                                        callback_data="toggle_detector_status_keyboard")
-inline_mode_keyboard_btn6 = types.InlineKeyboardButton("Get detector status",
+inline_mode_keyboard_btn6 = types.InlineKeyboardButton("\u2733 Get detector status",
                                                        callback_data="get_detector_status_keyboard")
 
 inline_mode_keyboard.row(inline_mode_keyboard_btn1, inline_mode_keyboard_btn2, inline_mode_keyboard_btn3)
 inline_mode_keyboard.row(inline_mode_keyboard_btn4)
 inline_mode_keyboard.row(inline_mode_keyboard_btn5, inline_mode_keyboard_btn6)
 
-###############################     MANAGE KEYBOARD  #####################################
-
-inline_manage_keyboard = types.InlineKeyboardMarkup()
-inline_manage_keyboard_btn1 = types.InlineKeyboardButton("Motion agent", callback_data="motion_agent_keyboard")
-inline_manage_keyboard_btn2 = types.InlineKeyboardButton("Detector agent", callback_data="detector_agent_keyboard")
-
-inline_manage_keyboard.row(inline_manage_keyboard_btn1, inline_manage_keyboard_btn2)
-
 ###############################     CONFIGURATION KEYBOARD  #################################
 
 inline_configuration_keyboard = types.InlineKeyboardMarkup()
-inline_configuration_keyboard_btn1 = types.InlineKeyboardButton("Photo", callback_data="configuration_photo_keyboard")
-inline_configuration_keyboard_btn2 = types.InlineKeyboardButton("Video", callback_data="configuration_video_keyboard")
+inline_configuration_keyboard_btn1 = types.InlineKeyboardButton("\U0001F4F7 Photo", callback_data="configuration_photo_keyboard")
+inline_configuration_keyboard_btn2 = types.InlineKeyboardButton("\U0001F4F9 Video", callback_data="configuration_video_keyboard")
 
 inline_configuration_keyboard.row(inline_configuration_keyboard_btn1, inline_configuration_keyboard_btn2)
 
 ###############################     AUTOMATIC KEYBOARD  #################################
 
 inline_automatic_keyboard = types.InlineKeyboardMarkup()
-inline_automatic_keyboard_btn1 = types.InlineKeyboardButton("Photo", callback_data="automatic_photo_keyboard")
-inline_automatic_keyboard_btn2 = types.InlineKeyboardButton("Video", callback_data="automatic_video_keyboard")
+inline_automatic_keyboard_btn1 = types.InlineKeyboardButton("\U0001F4F7 Photo", callback_data="automatic_photo_keyboard")
+inline_automatic_keyboard_btn2 = types.InlineKeyboardButton("\U0001F4F9 Video", callback_data="automatic_video_keyboard")
 
 inline_automatic_keyboard.row(inline_automatic_keyboard_btn1, inline_automatic_keyboard_btn2)
 
 ###############################     MANUAL KEYBOARD  #################################
 
 inline_manual_keyboard = types.InlineKeyboardMarkup()
-inline_manual_keyboard_btn1 = types.InlineKeyboardButton("Take photo", callback_data="manual_photo_keyboard")
-inline_manual_keyboard_btn2 = types.InlineKeyboardButton("Record video", callback_data="manual_video_keyboard")
+inline_manual_keyboard_btn1 = types.InlineKeyboardButton("\U0001F4F7 Take photo", callback_data="manual_photo_keyboard")
+inline_manual_keyboard_btn2 = types.InlineKeyboardButton("\U0001F4F9 Record video", callback_data="manual_video_keyboard")
 
 inline_manual_keyboard.row(inline_manual_keyboard_btn1, inline_manual_keyboard_btn2)
 
@@ -961,23 +952,23 @@ inline_manual_video_keyboard.row(inline_manual_video_keyboard_btn4, inline_manua
 ###############################     STREAMING KEYBOARD  #################################
 
 inline_streaming_keyboard = types.InlineKeyboardMarkup()
-inline_streaming_keyboard_btn1 = types.InlineKeyboardButton("Activate", callback_data="activate_streaming_keyboard")
-inline_streaming_keyboard_btn2 = types.InlineKeyboardButton("Deactivate", callback_data="deactivate_streaming_keyboard")
+inline_streaming_keyboard_btn1 = types.InlineKeyboardButton("\u2705 Activate", callback_data="activate_streaming_keyboard")
+inline_streaming_keyboard_btn2 = types.InlineKeyboardButton("\u274C Deactivate", callback_data="deactivate_streaming_keyboard")
 
 inline_streaming_keyboard.row(inline_streaming_keyboard_btn1, inline_streaming_keyboard_btn2)
 
 ###############################     CONFIGURATION PHOTO KEYBOARD  #################################
 
 inline_photo_configuration_keyboard = types.InlineKeyboardMarkup()
-inline_photo_configuration_keyboard_btn1 = types.InlineKeyboardButton("Resolution",
+inline_photo_configuration_keyboard_btn1 = types.InlineKeyboardButton("\U0001F533 Resolution",
                                                                       callback_data="resolution_configuration_photo_keyboard")
-inline_photo_configuration_keyboard_btn2 = types.InlineKeyboardButton("Rotation",
+inline_photo_configuration_keyboard_btn2 = types.InlineKeyboardButton("\U0001F504 Rotation",
                                                                       callback_data="rotation_configuration_photo_keyboard")
-inline_photo_configuration_keyboard_btn3 = types.InlineKeyboardButton("Vflip",
+inline_photo_configuration_keyboard_btn3 = types.InlineKeyboardButton("\u2B06 Vflip",
                                                                       callback_data="vflip_configuration_photo_keyboard")
-inline_photo_configuration_keyboard_btn4 = types.InlineKeyboardButton("Hflip",
+inline_photo_configuration_keyboard_btn4 = types.InlineKeyboardButton("\u2B05 Hflip",
                                                                       callback_data="hflip_configuration_photo_keyboard")
-inline_photo_configuration_keyboard_btn5 = types.InlineKeyboardButton("Show current configuration",
+inline_photo_configuration_keyboard_btn5 = types.InlineKeyboardButton("\u2B55 Show current configuration",
                                                                       callback_data="get_configuration_photo_keyboard")
 
 inline_photo_configuration_keyboard.row(inline_photo_configuration_keyboard_btn1,
@@ -989,17 +980,17 @@ inline_photo_configuration_keyboard.row(inline_photo_configuration_keyboard_btn5
 ###############################    CONFIGURATION VIDEO KEYBOARD  #################################
 
 inline_video_configuration_keyboard = types.InlineKeyboardMarkup()
-inline_video_configuration_keyboard_btn1 = types.InlineKeyboardButton("Resolution",
+inline_video_configuration_keyboard_btn1 = types.InlineKeyboardButton("\U0001F533 Resolution",
                                                                       callback_data="resolution_configuration_video_keyboard")
-inline_video_configuration_keyboard_btn2 = types.InlineKeyboardButton("Rotation",
+inline_video_configuration_keyboard_btn2 = types.InlineKeyboardButton("\U0001F504 Rotation",
                                                                       callback_data="rotation_configuration_video_keyboard")
-inline_video_configuration_keyboard_btn3 = types.InlineKeyboardButton("Vflip",
+inline_video_configuration_keyboard_btn3 = types.InlineKeyboardButton("\u2B06 Vflip",
                                                                       callback_data="vflip_configuration_video_keyboard")
-inline_video_configuration_keyboard_btn4 = types.InlineKeyboardButton("Hflip",
+inline_video_configuration_keyboard_btn4 = types.InlineKeyboardButton("\u2B05 Hflip",
                                                                       callback_data="hflip_configuration_video_keyboard")
-inline_video_configuration_keyboard_btn5 = types.InlineKeyboardButton("Show datetime",
+inline_video_configuration_keyboard_btn5 = types.InlineKeyboardButton("\u23F3 Show datetime",
                                                                       callback_data="datetime_configuration_video_keyboard")
-inline_video_configuration_keyboard_btn6 = types.InlineKeyboardButton("Show current configuration",
+inline_video_configuration_keyboard_btn6 = types.InlineKeyboardButton("\u2B55 Show current configuration",
                                                                       callback_data="get_configuration_photo_keyboard")
 
 inline_video_configuration_keyboard.row(inline_video_configuration_keyboard_btn1,
@@ -1045,10 +1036,10 @@ inline_photo_rotation_keyboard.row(inline_photo_rotation_keyboard_btn5)
 ###############################    PHOTO VFLIP KEYBOARD  #################################
 
 inline_photo_vflip_keyboard = types.InlineKeyboardMarkup()
-inline_photo_vflip_keyboard_btn1 = types.InlineKeyboardButton("Activate", callback_data="photo_activate_vflip_keyboard")
-inline_photo_vflip_keyboard_btn2 = types.InlineKeyboardButton("Deactivate",
+inline_photo_vflip_keyboard_btn1 = types.InlineKeyboardButton("\u2705 Activate", callback_data="photo_activate_vflip_keyboard")
+inline_photo_vflip_keyboard_btn2 = types.InlineKeyboardButton("\u274C Deactivate",
                                                               callback_data="photo_deactivate_vflip_keyboard")
-inline_photo_vflip_keyboard_btn3 = types.InlineKeyboardButton("Show current value",
+inline_photo_vflip_keyboard_btn3 = types.InlineKeyboardButton("\u2B55 Show current value",
                                                               callback_data="get_photo_vflip_keyboard")
 inline_photo_vflip_keyboard.row(inline_photo_vflip_keyboard_btn1, inline_photo_vflip_keyboard_btn2)
 inline_photo_vflip_keyboard.row(inline_photo_vflip_keyboard_btn3)
@@ -1056,10 +1047,10 @@ inline_photo_vflip_keyboard.row(inline_photo_vflip_keyboard_btn3)
 ###############################    PHOTO HFLIP KEYBOARD  #################################
 
 inline_photo_hflip_keyboard = types.InlineKeyboardMarkup()
-inline_photo_hflip_keyboard_btn1 = types.InlineKeyboardButton("Activate", callback_data="photo_activate_hflip_keyboard")
-inline_photo_hflip_keyboard_btn2 = types.InlineKeyboardButton("Deactivate",
+inline_photo_hflip_keyboard_btn1 = types.InlineKeyboardButton("\u2705 Activate", callback_data="photo_activate_hflip_keyboard")
+inline_photo_hflip_keyboard_btn2 = types.InlineKeyboardButton("\u274C Deactivate",
                                                               callback_data="photo_deactivate_hflip_keyboard")
-inline_photo_hflip_keyboard_btn3 = types.InlineKeyboardButton("Show current value",
+inline_photo_hflip_keyboard_btn3 = types.InlineKeyboardButton("\u2B55 Show current value",
                                                               callback_data="get_photo_hflip_keyboard")
 inline_photo_hflip_keyboard.row(inline_photo_hflip_keyboard_btn1, inline_photo_hflip_keyboard_btn2)
 inline_photo_hflip_keyboard.row(inline_photo_hflip_keyboard_btn3)
@@ -1098,10 +1089,10 @@ inline_video_rotation_keyboard.row(inline_video_rotation_keyboard_btn5)
 ###############################    VIDEO VFLIP KEYBOARD  #################################
 
 inline_video_vflip_keyboard = types.InlineKeyboardMarkup()
-inline_video_vflip_keyboard_btn1 = types.InlineKeyboardButton("Activate", callback_data="video_activate_vflip_keyboard")
-inline_video_vflip_keyboard_btn2 = types.InlineKeyboardButton("Deactivate",
+inline_video_vflip_keyboard_btn1 = types.InlineKeyboardButton("\u2705 Activate", callback_data="video_activate_vflip_keyboard")
+inline_video_vflip_keyboard_btn2 = types.InlineKeyboardButton("\u274C Deactivate",
                                                               callback_data="video_deactivate_vflip_keyboard")
-inline_video_vflip_keyboard_btn3 = types.InlineKeyboardButton("Show current value",
+inline_video_vflip_keyboard_btn3 = types.InlineKeyboardButton("\u2B55 Show current value",
                                                               callback_data="get_video_vflip_keyboard")
 inline_video_vflip_keyboard.row(inline_video_vflip_keyboard_btn1, inline_video_vflip_keyboard_btn2)
 inline_video_vflip_keyboard.row(inline_video_vflip_keyboard_btn3)
@@ -1109,10 +1100,10 @@ inline_video_vflip_keyboard.row(inline_video_vflip_keyboard_btn3)
 ###############################    VIDEO HFLIP KEYBOARD  #################################
 
 inline_video_hflip_keyboard = types.InlineKeyboardMarkup()
-inline_video_hflip_keyboard_btn1 = types.InlineKeyboardButton("Activate", callback_data="video_activate_hflip_keyboard")
-inline_video_hflip_keyboard_btn2 = types.InlineKeyboardButton("Deactivate",
+inline_video_hflip_keyboard_btn1 = types.InlineKeyboardButton("\u2705 Activate", callback_data="video_activate_hflip_keyboard")
+inline_video_hflip_keyboard_btn2 = types.InlineKeyboardButton("\u274C Deactivate",
                                                               callback_data="video_deactivate_hflip_keyboard")
-inline_video_hflip_keyboard_btn3 = types.InlineKeyboardButton("Show current value",
+inline_video_hflip_keyboard_btn3 = types.InlineKeyboardButton("\u2B55 Show current value",
                                                               callback_data="get_video_hflip_keyboard")
 inline_video_hflip_keyboard.row(inline_video_hflip_keyboard_btn1, inline_video_hflip_keyboard_btn2)
 inline_video_hflip_keyboard.row(inline_video_hflip_keyboard_btn3)
@@ -1120,11 +1111,11 @@ inline_video_hflip_keyboard.row(inline_video_hflip_keyboard_btn3)
 ###############################    VIDEO DATETIME KEYBOARD  #################################
 
 inline_video_datetime_keyboard = types.InlineKeyboardMarkup()
-inline_video_datetime_keyboard_btn1 = types.InlineKeyboardButton("Activate",
+inline_video_datetime_keyboard_btn1 = types.InlineKeyboardButton("\u2705 Activate",
                                                                  callback_data="video_activate_datetime_keyboard")
-inline_video_datetime_keyboard_btn2 = types.InlineKeyboardButton("Deactivate",
+inline_video_datetime_keyboard_btn2 = types.InlineKeyboardButton("\u274C Deactivate",
                                                                  callback_data="video_deactivate_datetime_keyboard")
-inline_video_datetime_keyboard_btn3 = types.InlineKeyboardButton("Show current value",
+inline_video_datetime_keyboard_btn3 = types.InlineKeyboardButton("\u2B55 Show current value",
                                                                  callback_data="get_video_datetime_keyboard")
 inline_video_datetime_keyboard.row(inline_video_datetime_keyboard_btn1, inline_video_datetime_keyboard_btn2)
 inline_video_datetime_keyboard.row(inline_video_datetime_keyboard_btn3)
@@ -1134,12 +1125,6 @@ inline_video_datetime_keyboard.row(inline_video_datetime_keyboard_btn3)
 @bot.callback_query_handler(lambda query: query.data == "mode_keyboard")
 def mode_keyboard_callback(query):
     mode_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "manage_keyboard")
-def manage_keyboard_callback(query):
-    manage_keyboard(query)
 
 ##############################################################################################
 
@@ -1177,25 +1162,54 @@ def get_detector_status_keyboard_callback(query):
 
 def mode_keyboard(query):
     chat_id = query.message.chat.id
-    bot.send_message(chat_id, "Mode selection: Choose one: ", reply_markup=inline_mode_keyboard)
-
-##############################################################################################
-
-def manage_keyboard(query):
-    chat_id = query.message.chat.id
-    bot.send_message(chat_id, "Manage selection: Choose one: ", reply_markup=inline_manage_keyboard)
+    bot.send_message(chat_id, "\u2B50 Mode selection: Choose one: ", reply_markup=inline_mode_keyboard)
 
 ##############################################################################################
 
 def configuration_keyboard(query):
     chat_id = query.message.chat.id
-    bot.send_message(chat_id, "Configuration selection:", reply_markup=inline_configuration_keyboard)
+    bot.send_message(chat_id, "\U0001F527 Configuration selection:", reply_markup=inline_configuration_keyboard)
 
 ##############################################################################################
 
 def commands_keyboard(query):
     chat_id = query.message.chat.id
-    bot.send_message(chat_id, "Command list: ... ")
+
+    command_message = '' + \
+"""
+** \U0001F4BB Available Commands \U0001F4BB **
+-------------------- 
+Below is a list of available commands to use. 
+It is recommended that you use the interface, as there are more
+extensive and intuitive features than by commands.
+
+- Button interface:
+----------------
+/start: Access to the main application interface.
+
+- Actions:
+-----------
+/photo: Take a photo and send it to the conversation.
+/video <seconds>: Record a video with a duration <seconds> and send it to the conversation.
+By default, the duration is 10 seconds.
+/detector: Activates and deactivates the filtering of images in automatic mode in which people are detected.
+/gmode: Returns current detector status (if detector is activated or deactivated).
+
+- Modes:
+------
+/manual: Activates the manual mode.
+/automatic <photo|video> Activates automatic mode in photo or video mode.
+/streaming: Activates live video streaming.
+/gmode: Shows current mode.
+
+- Utility
+-------
+/id: Returns your telegram user id.
+/username: Returns your telegram username.
+/credentials: Returns your telegram user id and username.
+"""
+
+    bot.send_message(chat_id, command_message)
 
 ##############################################################################################
 
@@ -1240,13 +1254,13 @@ def get_detector_status_keyboard_callback(query):
 def manual_keyboard(query):
     message = query.message
     enable_manual_mode_bot(message)
-    bot.send_message(message.chat.id, "Choose an action: ", reply_markup=inline_manual_keyboard)
+    bot.send_message(message.chat.id, "\U0001F446 Choose an action: ", reply_markup=inline_manual_keyboard)
 
 ##############################################################################################
 
 def automatic_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Automatic mode: Select resource:", reply_markup=inline_automatic_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F2 Automatic mode: Select resource:", reply_markup=inline_automatic_keyboard)
 
 ##############################################################################################
 
@@ -1326,7 +1340,7 @@ def manual_photo_keyboard(query):
 
 def manual_video_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Select seconds number", reply_markup=inline_manual_video_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F9 Select seconds number", reply_markup=inline_manual_video_keyboard)
 
 ##############################################################################################
 
@@ -1410,13 +1424,13 @@ def configuration_video_keyboard_callback(query):
 
 def configuration_photo_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Photo configuration:", reply_markup=inline_photo_configuration_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F7\U0001F527 Photo configuration:", reply_markup=inline_photo_configuration_keyboard)
 
 ##############################################################################################
 
 def configuration_video_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Video configuration:", reply_markup=inline_video_configuration_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F9\U0001F527 Video configuration:", reply_markup=inline_video_configuration_keyboard)
 
 ##############################################################################################
 
@@ -1456,19 +1470,25 @@ def get_configuration_photo_keyboard_callback(query):
 
 def resolution_configuration_photo_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Photo resolution configuration:", reply_markup=inline_photo_resolution_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F7\U0001F533 Photo resolution configuration:", reply_markup=inline_photo_resolution_keyboard)
 
 ##############################################################################################
 
 def rotation_configuration_photo_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Photo rotation configuration:", reply_markup=inline_photo_rotation_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F7\U0001F504 Photo rotation configuration:", reply_markup=inline_photo_rotation_keyboard)
 
 ##############################################################################################
 
 def vflip_configuration_photo_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Photo vflip configuration:", reply_markup=inline_photo_vflip_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F7\U0001F504 Photo vflip configuration:", reply_markup=inline_photo_vflip_keyboard)
+
+##############################################################################################
+
+def hflip_configuration_photo_keyboard(query):
+    message = query.message
+    bot.send_message(message.chat.id, "\U0001F4F7\U0001F504 Photo hflip configuration:", reply_markup=inline_photo_hflip_keyboard)
 
 ##############################################################################################
 
@@ -1696,6 +1716,24 @@ def photo_deactivate_vflip_keyboard_callback(query):
 def get_photo_vflip_keyboard_callback(query):
     get_photo_vflip_keyboard(query)
 
+###############################    CONFIGURATION PHOTO HFLIP HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_activate_hflip_keyboard")
+def photo_activate_hflip_keyboard_callback(query):
+    photo_activate_hflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_deactivate_hflip_keyboard")
+def photo_deactivate_hflip_keyboard_callback(query):
+    photo_deactivate_hflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_photo_hflip_keyboard")
+def get_photo_hflip_keyboard_callback(query):
+    get_photo_hflip_keyboard(query)
+
 ##############################################################################################
 
 ###############################      CONFIGURATION PHOTO VFLIP FUNCTIONS   #################################
@@ -1840,31 +1878,31 @@ def datetime_configuration_video_keyboard_callback(query):
 
 def resolution_configuration_video_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Video resolution configuration:", reply_markup=inline_video_resolution_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F9\U0001F533 Video resolution configuration:", reply_markup=inline_video_resolution_keyboard)
 
 ##############################################################################################
 
 def rotation_configuration_video_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Video rotation configuration:", reply_markup=inline_video_rotation_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F9\U0001F504 Video rotation configuration:", reply_markup=inline_video_rotation_keyboard)
 
 ##############################################################################################
 
 def vflip_configuration_video_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Video vflip configuration:", reply_markup=inline_video_vflip_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F9\u2B06 Video vflip configuration:", reply_markup=inline_video_vflip_keyboard)
 
 ##############################################################################################
 
 def hflip_configuration_video_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Video hflip configuration:", reply_markup=inline_video_hflip_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F9\u2B05 Video hflip configuration:", reply_markup=inline_video_hflip_keyboard)
 
 ##############################################################################################
 
 def datetime_configuration_video_keyboard(query):
     message = query.message
-    bot.send_message(message.chat.id, "Video datetime configuration:", reply_markup=inline_video_datetime_keyboard)
+    bot.send_message(message.chat.id, "\U0001F4F9\u23F3 Video datetime configuration:", reply_markup=inline_video_datetime_keyboard)
 
 ##############################################################################################
 
