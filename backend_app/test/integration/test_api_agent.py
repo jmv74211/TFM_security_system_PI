@@ -8,7 +8,7 @@ import requests
 import glob
 
 
-class TestLoggerModule(unittest.TestCase):
+class TestAPIAgent(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
@@ -26,6 +26,19 @@ class TestLoggerModule(unittest.TestCase):
         # self.auth_data = dict(user=self.user, password=self.password)
         self.auth_data = json.dumps({"user": self.user, "password": self.password})
         self.API_url_path = settings.API_AGENT_IP_ADDRESS + ":" + repr(settings.API_AGENT_RUNNING_PORT)
+
+    ##############################################################################################
+
+    def test0_check_api_status(self):
+        url = os.path.join(self.API_url_path, "api","echo")
+
+        try:
+            req = requests.get(url)
+        except:
+            print("API agent is not running.")
+            raise
+
+        self.assertEqual(req.status_code, 200)
 
     ##############################################################################################
 
@@ -363,7 +376,7 @@ class TestLoggerModule(unittest.TestCase):
         req_3_status = req_3_data['status']  # STARTED
         stop_task_success = 'successfully' in req_3_status  # Message contains successfully that means OK
 
-        time.sleep(1)
+        time.sleep(2)
 
         # CHECK TASK STATUS
         req_4 = requests.get(url_task_check, data=self.auth_data, headers=self.headers)
@@ -534,13 +547,6 @@ class TestLoggerModule(unittest.TestCase):
         url_generate = url_base + "/api/motion_agent/generate_alert"
         url_check = url_base + "/api/motion_agent/check_alert"
 
-        # Send check request
-        req = requests.get(url_check, data=self.auth_data, headers=self.headers)
-        check_alert_response = req.json()
-        check_alert_message = check_alert_response['alert']
-
-        time.sleep(0.3)
-
         # Send generate request with missing file data
         req_2 = requests.post(url_generate, data=self.auth_data, headers=self.headers)
         generate_response = req_2.json()
@@ -580,14 +586,12 @@ class TestLoggerModule(unittest.TestCase):
         #                                     CHECKS                                              #
         # ----------------------------------------------------------------------------------------#
 
-        self.assertEqual(req.status_code, 200)
         self.assertEqual(req_2.status_code, 400)
         self.assertEqual(req_3.status_code, 200)
         self.assertEqual(req_4.status_code, 200)
         self.assertEqual(req_5.status_code, 200)
         self.assertEqual(req_6.status_code, 200)
 
-        self.assertFalse(check_alert_message)
         self.assertEqual(generate_message, 'Error, file path data is missing')
         self.assertFalse(check_alert_message_2)
         self.assertEqual(generate_message_2, 'The alert has been received')
