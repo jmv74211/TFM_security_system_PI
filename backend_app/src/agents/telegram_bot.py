@@ -211,6 +211,7 @@ def send_photo(chat_id, file_path):
 
 def send_video(chat_id, file_path):
     try:
+
         video = open(file_path, 'rb')
 
         bot.send_video(chat_id, video)
@@ -270,8 +271,8 @@ def deactivate_streaming_server():
 """
 
 
-def activate_motion_agent():
-    payload = {'user': api_agent_user, 'password': api_agent_password}
+def activate_motion_agent(mode="photo"):
+    payload = {'user': api_agent_user, 'password': api_agent_password, 'mode': mode}
 
     try:
         activate_motion_agent_request = requests.post(main_agent_host + "/api/motion_agent/activate", json=payload)
@@ -616,9 +617,8 @@ def send_video_bot(message, record_time=10):
 
     if len(argument_list) > 0 and argument_list[0].isdigit():  # Means that video command has one or more parameters
         record_time = int(argument_list[0])  # Get the time parameters in seconds
-        payload = {'user': api_agent_user, 'password': api_agent_password, 'recordtime': record_time}
-    else:
-        payload = {'user': api_agent_user, 'password': api_agent_password}
+
+    payload = {'user': api_agent_user, 'password': api_agent_password, 'recordtime': record_time}
 
     bot.send_message(chat_id, "It is going to be recorded a video with {} seconds length".format(record_time))
 
@@ -694,6 +694,12 @@ def enable_automatic_mode_bot(message, motion_agent_mode="photo"):
     global mode
     chat_id = message.chat.id
 
+    # If current mode is automatic, returns, because if not, it can cause an interlock
+    if mode == "automatic":
+        bot.send_message(chat_id, "You are already in automatic mode. If you want to change the resource, please change "
+                                  "to manual mode and then activate the automatic mode again, choosing your new desired resource")
+        return
+
     # Extract arguments list command
     argument_list = extract_arg(message.text)
     if len(argument_list) > 0 and argument_list[0] == "video":
@@ -715,7 +721,7 @@ def enable_automatic_mode_bot(message, motion_agent_mode="photo"):
 
         # request to activate the motion agent
         try:
-            activate_motion_agent()
+            activate_motion_agent(motion_agent_mode)
             bot.send_message(chat_id, "Mode selected: Automatic")
         except:
             bot.send_message(chat_id, "Error: could not activate automatic mode")
@@ -741,8 +747,9 @@ def enable_automatic_mode_bot(message, motion_agent_mode="photo"):
                     logger.error("[agent: telegram_bot]: Could not send the photo, maybe wrong photo file")
                     bot.send_message(chat_id, "Sorry, could not send the photo alert")
             else:  # Video mode
+
                 try:
-                    bot.send_message(chat_id, "Alert at {}, sending photo...").format(get_file_datetime(file_path))
+                    bot.send_message(chat_id, "Alert at {}, sending video...".format(get_file_datetime(file_path)))
                     send_video(chat_id, file_path)
                 except:
                     logger.error("[agent: telegram_bot]: Could not send the video, maybe wrong video file")
@@ -1050,7 +1057,7 @@ inline_video_configuration_keyboard_btn4 = types.InlineKeyboardButton("\u2B05 Hf
 inline_video_configuration_keyboard_btn5 = types.InlineKeyboardButton("\u23F3 Show datetime",
                                                                       callback_data="datetime_configuration_video_keyboard")
 inline_video_configuration_keyboard_btn6 = types.InlineKeyboardButton("\u2B55 Show current configuration",
-                                                                      callback_data="get_configuration_photo_keyboard")
+                                                                      callback_data="get_configuration_video_keyboard")
 
 inline_video_configuration_keyboard.row(inline_video_configuration_keyboard_btn1,
                                         inline_video_configuration_keyboard_btn2)
