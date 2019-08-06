@@ -1,13 +1,13 @@
 import telebot  # Telegram API
-from telebot import types  # Import to use telegram buttons
 import requests, json  # Imports to make an decode requests
 from time import sleep  # sleep
 from functools import wraps  # Import to use decoration functions
 import yaml  # Import to read the configuration file
-import settings  # Import to read configuration info
-from modules.logger import TelegramBotAgentLogger
 import os  # Joins path
 import re  # regex
+from modules.logger import TelegramBotAgentLogger
+import settings  # Import to read configuration info
+from telebot import types
 
 ##############################################################################################
 
@@ -90,6 +90,48 @@ def authtentication_required(f):
 
         if not allowed:
             bot.send_message(message.chat.id, "You have not permission to access to this content")
+            return -1
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+##############################################################################################
+
+"""
+    Function to check if the api agent and/or object detector agent services is running. 
+"""
+
+
+def services_are_running(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        if isinstance(args[0], telebot.types.CallbackQuery):
+            chat_id = args[0].message.chat.id
+        else: # message instance
+            chat_id = args[0].chat.id
+
+        api_agent_address = "{}:{}".format(settings.API_AGENT_IP_ADDRESS, settings.API_AGENT_RUNNING_PORT)
+        api_agent_url = os.path.join(api_agent_address, "api", "echo")
+
+        try:
+            requests.get(api_agent_url)
+        except:
+            bot.send_message(chat_id, "\u274C API agent is off. Please activate the service in your server to use the bot" )
+            return -1
+
+        if settings.DETECTOR_AGENT_STATUS:
+
+            object_detector_agent_address = "{}:{}".format(settings.DETECTOR_AGENT_IP_ADDRESS, settings.DETECTOR_AGENT_RUNNING_PORT)
+            object_detector_agent_url = os.path.join(object_detector_agent_address, "api", "echo")
+
+            try:
+                requests.get(object_detector_agent_url)
+            except:
+                bot.send_message(chat_id, "\u274C Object detector agent is off and is enabled in the configuration. "
+                                                  "Please activate the agent service in your server or deactivate it "
+                                                  "in \u2B50 Mode -> \u2B55 Toggle detector status")
             return -1
 
         return f(*args, **kwargs)
@@ -488,13 +530,12 @@ def get_credentials_bot(message):
 
 ##############################################################################################
 
-
 """
     Take a photo and send it using /photo command
 """
 
-
 @bot.message_handler(commands=['photo'])
+@services_are_running
 @authtentication_required
 def send_photo_bot(message):
     chat_id = message.chat.id
@@ -561,6 +602,7 @@ def send_photo_bot(message):
 
 
 @bot.message_handler(commands=['video'])
+@services_are_running
 @authtentication_required
 def send_video_bot(message, record_time=10):
     # Extract arguments list command
@@ -646,6 +688,7 @@ def send_video_bot(message, record_time=10):
 
 
 @bot.message_handler(commands=['automatic'])
+@services_are_running
 @authtentication_required
 def enable_automatic_mode_bot(message, motion_agent_mode="photo"):
     global mode
@@ -717,6 +760,7 @@ def enable_automatic_mode_bot(message, motion_agent_mode="photo"):
 
 
 @bot.message_handler(commands=['manual'])
+@services_are_running
 @authtentication_required
 def enable_manual_mode_bot(message):
     global mode
@@ -758,6 +802,7 @@ def enable_manual_mode_bot(message):
 
 
 @bot.message_handler(commands=['streaming'])
+@services_are_running
 @authtentication_required
 def enable_streaming_mode_bot(message):
     global mode
@@ -794,6 +839,7 @@ def enable_streaming_mode_bot(message):
 
 
 @bot.message_handler(commands=['gmode'])
+@services_are_running
 @authtentication_required
 def get_mode_bot(message):
     chat_id = message.chat.id
@@ -851,6 +897,7 @@ def toogle_detector_bot(message):
 
 
 @bot.message_handler(commands=['gdetector'])
+@services_are_running
 @authtentication_required
 def get_detector_status_bot(message):
     chat_id = message.chat.id
@@ -870,17 +917,29 @@ def get_detector_status_bot(message):
 @bot.message_handler(commands=['start'])
 def start_keyboard(message):
     chat_id = message.chat.id
-    bot.send_message(chat_id, "Dashboard: Choose one option:", reply_markup=inline_start_keyboard)
-
+    bot.send_message(chat_id, "\U0001F4CC Dashboard: Choose one option:", reply_markup=inline_start_keyboard)
 
 ##############################################################################################
+
+"""
+    Start user interface starting with any character button
+"""
+
+
+@bot.message_handler(regexp="^[a-z,A-Z]")
+def start_keyboard(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "\U0001F4CC Dashboard: Choose one option:", reply_markup=inline_start_keyboard)
+
+##############################################################################################
+
+######################################  START BOT INTERFACE  #################################
 
 ##############################################################################################
 #                                                                                            #
 #                                    BOT INLINE KEYBOARD                                     #
 #                                                                                            #
 ##############################################################################################
-
 
 ###############################     MODE KEYBOARD  ##########################################
 
@@ -1120,6 +1179,13 @@ inline_video_datetime_keyboard_btn3 = types.InlineKeyboardButton("\u2B55 Show cu
 inline_video_datetime_keyboard.row(inline_video_datetime_keyboard_btn1, inline_video_datetime_keyboard_btn2)
 inline_video_datetime_keyboard.row(inline_video_datetime_keyboard_btn3)
 
+
+##############################################################################################
+#                                                                                            #
+#                             BOT INLINE KEYBOARD CALLBACK HANDLERS                          #
+#                                                                                            #
+##############################################################################################
+
 ###############################    DASHBOARD HANDLERS   #################################
 
 @bot.callback_query_handler(lambda query: query.data == "mode_keyboard")
@@ -1158,7 +1224,425 @@ def get_detector_status_keyboard_callback(query):
 
 ##############################################################################################
 
-###############################      DASHBOARD FUNCTIONS   #################################
+
+###############################    MODE HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_keyboard")
+def manual_keyboard_callback(query):
+    manual_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "automatic_keyboard")
+def automatic_keyboard_callback(query):
+    automatic_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "streaming_keyboard")
+def streaming_keyboard_callback(query):
+    streaming_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_mode_keyboard")
+def get_mode_keyboard_callback(query):
+    get_mode_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "toggle_detector_status_keyboard")
+def toggle_detector_status_keyboard_callback(query):
+    toggle_detector_status_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_detector_status_keyboard")
+def get_detector_status_keyboard_callback(query):
+    get_detector_status_keyboard(query)
+
+##############################################################################################
+
+###############################    AUTOMATIC HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "automatic_photo_keyboard")
+def photo_automatic_keyboard_callback(query):
+    automatic_photo_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "automatic_video_keyboard")
+def video_automatic_keyboard_callback(query):
+    automatic_video_keyboard(query)
+
+##############################################################################################
+
+##############################    MANUAL HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_photo_keyboard")
+def photo_manual_keyboard_callback(query):
+    manual_photo_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_keyboard")
+def manual_automatic_keyboard_callback(query):
+    manual_video_keyboard(query)
+
+##############################################################################################
+
+###############################    MANUAL VIDEO HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_5_keyboard")
+def video_manual_5_keyboard_callback(query):
+    video_manual_5_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_10_keyboard")
+def video_manual_10_keyboard_callback(query):
+    video_manual_10_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_15_keyboard")
+def video_manual_15_keyboard_callback(query):
+    video_manual_15_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_20_keyboard")
+def video_manual_20_keyboard_callback(query):
+    video_manual_20_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "manual_video_25_keyboard")
+def video_manual_25_keyboard_callback(query):
+    video_manual_25_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "configuration_photo_keyboard")
+def configuration_photo_keyboard_callback(query):
+    configuration_photo_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "configuration_video_keyboard")
+def configuration_video_keyboard_callback(query):
+    configuration_video_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION PHOTO HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "resolution_configuration_photo_keyboard")
+def resolution_configuration_photo_keyboard_callback(query):
+    resolution_configuration_photo_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "rotation_configuration_photo_keyboard")
+def rotation_configuration_photo_keyboard_callback(query):
+    rotation_configuration_photo_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "vflip_configuration_photo_keyboard")
+def vflip_configuration_photo_keyboard_callback(query):
+    vflip_configuration_photo_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "hflip_configuration_photo_keyboard")
+def hflip_configuration_photo_keyboard_callback(query):
+    hflip_configuration_photo_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_configuration_photo_keyboard")
+def get_configuration_photo_keyboard_callback(query):
+    get_configuration_photo_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION PHOTO RESOLUTION HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "low_photo_resolution_keyboard")
+def low_photo_resolution_keyboard_callback(query):
+    low_photo_resolution_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "medium_photo_resolution_keyboard")
+def medium_photo_resolution_keyboard_callback(query):
+    medium_photo_resolution_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "high_photo_resolution_keyboard")
+def high_photo_resolution_keyboard_callback(query):
+    high_photo_resolution_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "ultra_photo_resolution_keyboard")
+def ultra_photo_resolution_keyboard_callback(query):
+    ultra_photo_resolution_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_photo_resolution_keyboard")
+def get_photo_resolution_keyboard_callback(query):
+    get_photo_resolution_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION PHOTO ROTATION HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_rotation_0_keyboard")
+def photo_rotation_0_keyboard_callback(query):
+    photo_rotation_0_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_rotation_90_keyboard")
+def photo_rotation_90_keyboard_callback(query):
+    photo_rotation_90_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_rotation_180_keyboard")
+def photo_rotation_180_keyboard_callback(query):
+    photo_rotation_180_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_rotation_270_keyboard")
+def photo_rotation_270_keyboard_callback(query):
+    photo_rotation_270_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_photo_rotation_keyboard")
+def get_photo_rotation_keyboard_callback(query):
+    get_photo_rotation_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION PHOTO VFLIP HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_activate_vflip_keyboard")
+def photo_activate_vflip_keyboard_callback(query):
+    photo_activate_vflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_deactivate_vflip_keyboard")
+def photo_deactivate_vflip_keyboard_callback(query):
+    photo_deactivate_vflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_photo_vflip_keyboard")
+def get_photo_vflip_keyboard_callback(query):
+    get_photo_vflip_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION PHOTO HFLIP HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_activate_hflip_keyboard")
+def photo_activate_hflip_keyboard_callback(query):
+    photo_activate_hflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "photo_deactivate_hflip_keyboard")
+def photo_deactivate_hflip_keyboard_callback(query):
+    photo_deactivate_hflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_photo_hflip_keyboard")
+def get_photo_hflip_keyboard_callback(query):
+    get_photo_hflip_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION VIDEO HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "resolution_configuration_video_keyboard")
+def resolution_configuration_video_keyboard_callback(query):
+    resolution_configuration_video_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "rotation_configuration_video_keyboard")
+def rotation_configuration_video_keyboard_callback(query):
+    rotation_configuration_video_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "vflip_configuration_video_keyboard")
+def vflip_configuration_video_keyboard_callback(query):
+    vflip_configuration_video_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "hflip_configuration_video_keyboard")
+def hflip_configuration_video_keyboard_callback(query):
+    hflip_configuration_video_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "hflip_configuration_video_keyboard")
+def hflip_configuration_video_keyboard_callback(query):
+    hflip_configuration_video_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_configuration_video_keyboard")
+def get_configuration_video_keyboard_callback(query):
+    get_configuration_video_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "datetime_configuration_video_keyboard")
+def datetime_configuration_video_keyboard_callback(query):
+    datetime_configuration_video_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION VIDEO RESOLUTION HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "low_video_resolution_keyboard")
+def low_video_resolution_keyboard_callback(query):
+    low_video_resolution_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "medium_video_resolution_keyboard")
+def medium_video_resolution_keyboard_callback(query):
+    medium_video_resolution_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "high_video_resolution_keyboard")
+def high_video_resolution_keyboard_callback(query):
+    high_video_resolution_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_video_resolution_keyboard")
+def get_video_resolution_keyboard_callback(query):
+    get_video_resolution_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION VIDEO ROTATION HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_rotation_0_keyboard")
+def video_rotation_0_keyboard_callback(query):
+    video_rotation_0_keyboard(query)
+
+##############################################################################################
+
+
+@bot.callback_query_handler(lambda query: query.data == "video_rotation_90_keyboard")
+def video_rotation_90_keyboard_callback(query):
+    video_rotation_90_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_rotation_180_keyboard")
+def video_rotation_180_keyboard_callback(query):
+    video_rotation_180_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_rotation_270_keyboard")
+def video_rotation_270_keyboard_callback(query):
+    video_rotation_270_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_video_rotation_keyboard")
+def get_video_rotation_keyboard_callback(query):
+    get_video_rotation_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION VIDEO VFLIP HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_activate_vflip_keyboard")
+def video_activate_vflip_keyboard_callback(query):
+    video_activate_vflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_deactivate_vflip_keyboard")
+def video_deactivate_vflip_keyboard_callback(query):
+    video_deactivate_vflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_video_vflip_keyboard")
+def get_video_vflip_keyboard_callback(query):
+    get_video_vflip_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION VIDEO HFLIP HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_activate_hflip_keyboard")
+def video_activate_hflip_keyboard_callback(query):
+    video_activate_hflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_deactivate_hflip_keyboard")
+def video_deactivate_hflip_keyboard_callback(query):
+    video_deactivate_hflip_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_video_hflip_keyboard")
+def get_video_hflip_keyboard_callback(query):
+    get_video_hflip_keyboard(query)
+
+##############################################################################################
+
+###############################    CONFIGURATION VIDEO DATETIME HANDLERS   #################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_activate_datetime_keyboard")
+def video_activate_datetime_keyboard_callback(query):
+    video_activate_datetime_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "video_deactivate_datetime_keyboard")
+def video_deactivate_datetime_keyboard_callback(query):
+    video_deactivate_datetime_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "get_video_datetime_keyboard")
+def get_video_datetime_keyboard_callback(query):
+    get_video_datetime_keyboard(query)
+
+##############################################################################################
+
+##############################################################################################
+#                                                                                            #
+#                             BOT INLINE KEYBOARD RESPONSE FUNCTIONS                         #
+#                                                                                            #
+##############################################################################################
+
+###############################      DASHBOARD FUNCTIONS   ###################################
 
 def mode_keyboard(query):
     chat_id = query.message.chat.id
@@ -1213,42 +1697,6 @@ By default, the duration is 10 seconds.
 
 ##############################################################################################
 
-###############################    MODE HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_keyboard")
-def manual_keyboard_callback(query):
-    manual_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "automatic_keyboard")
-def automatic_keyboard_callback(query):
-    automatic_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "streaming_keyboard")
-def streaming_keyboard_callback(query):
-    streaming_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_mode_keyboard")
-def get_mode_keyboard_callback(query):
-    get_mode_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "toggle_detector_status_keyboard")
-def toggle_detector_status_keyboard_callback(query):
-    toggle_detector_status_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_detector_status_keyboard")
-def get_detector_status_keyboard_callback(query):
-    get_detector_status_keyboard(query)
-
 ###############################      MODE FUNCTIONS   #################################
 
 def manual_keyboard(query):
@@ -1288,20 +1736,6 @@ def get_detector_status_keyboard(query):
 
 ##############################################################################################
 
-###############################    AUTOMATIC HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "automatic_photo_keyboard")
-def photo_automatic_keyboard_callback(query):
-    automatic_photo_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "automatic_video_keyboard")
-def video_automatic_keyboard_callback(query):
-    automatic_video_keyboard(query)
-
-##############################################################################################
-
 ###############################      AUTOMATIC FUNCTIONS   #################################
 
 def automatic_photo_keyboard(query):
@@ -1316,20 +1750,6 @@ def automatic_video_keyboard(query):
 
 ##############################################################################################
 
-###############################    MANUAL HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_photo_keyboard")
-def photo_manual_keyboard_callback(query):
-    manual_photo_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_video_keyboard")
-def manual_automatic_keyboard_callback(query):
-    manual_video_keyboard(query)
-
-##############################################################################################
-
 ###############################      MANUAL VIDEO FUNCTIONS   #################################
 
 def manual_photo_keyboard(query):
@@ -1341,40 +1761,6 @@ def manual_photo_keyboard(query):
 def manual_video_keyboard(query):
     message = query.message
     bot.send_message(message.chat.id, "\U0001F4F9 Select seconds number", reply_markup=inline_manual_video_keyboard)
-
-##############################################################################################
-
-###############################    MANUAL VIDEO HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_video_5_keyboard")
-def video_manual_5_keyboard_callback(query):
-    video_manual_5_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_video_10_keyboard")
-def video_manual_10_keyboard_callback(query):
-    video_manual_10_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_video_15_keyboard")
-def video_manual_15_keyboard_callback(query):
-    video_manual_15_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_video_20_keyboard")
-def video_manual_20_keyboard_callback(query):
-    video_manual_20_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "manual_video_25_keyboard")
-def video_manual_25_keyboard_callback(query):
-    video_manual_25_keyboard(query)
-
-##############################################################################################
 
 ###############################      MANUAL VIDEO FUNCTIONS   #################################
 
@@ -1408,18 +1794,6 @@ def video_manual_25_keyboard(query):
 
 ##############################################################################################
 
-###############################    CONFIGURATION HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "configuration_photo_keyboard")
-def configuration_photo_keyboard_callback(query):
-    configuration_photo_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "configuration_video_keyboard")
-def configuration_video_keyboard_callback(query):
-    configuration_video_keyboard(query)
-
 ###############################      CONFIGURATION FUNCTIONS   #################################
 
 def configuration_photo_keyboard(query):
@@ -1431,38 +1805,6 @@ def configuration_photo_keyboard(query):
 def configuration_video_keyboard(query):
     message = query.message
     bot.send_message(message.chat.id, "\U0001F4F9\U0001F527 Video configuration:", reply_markup=inline_video_configuration_keyboard)
-
-##############################################################################################
-
-###############################    CONFIGURATION PHOTO HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "resolution_configuration_photo_keyboard")
-def resolution_configuration_photo_keyboard_callback(query):
-    resolution_configuration_photo_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "rotation_configuration_photo_keyboard")
-def rotation_configuration_photo_keyboard_callback(query):
-    rotation_configuration_photo_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "vflip_configuration_photo_keyboard")
-def vflip_configuration_photo_keyboard_callback(query):
-    vflip_configuration_photo_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "hflip_configuration_photo_keyboard")
-def hflip_configuration_photo_keyboard_callback(query):
-    hflip_configuration_photo_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_configuration_photo_keyboard")
-def get_configuration_photo_keyboard_callback(query):
-    get_configuration_photo_keyboard(query)
 
 ##############################################################################################
 
@@ -1504,38 +1846,6 @@ def get_configuration_photo_keyboard(query):
         bot.send_message(message.chat.id, configuration_info)
     except:
         bot.send_message(message.chat.id, "Sorry, could not read the photo configuration")
-
-##############################################################################################
-
-###############################    CONFIGURATION PHOTO RESOLUTION HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "low_photo_resolution_keyboard")
-def low_photo_resolution_keyboard_callback(query):
-    low_photo_resolution_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "medium_photo_resolution_keyboard")
-def medium_photo_resolution_keyboard_callback(query):
-    medium_photo_resolution_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "high_photo_resolution_keyboard")
-def high_photo_resolution_keyboard_callback(query):
-    high_photo_resolution_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "ultra_photo_resolution_keyboard")
-def ultra_photo_resolution_keyboard_callback(query):
-    ultra_photo_resolution_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_photo_resolution_keyboard")
-def get_photo_resolution_keyboard_callback(query):
-    get_photo_resolution_keyboard(query)
 
 ##############################################################################################
 
@@ -1608,38 +1918,6 @@ def get_photo_resolution_keyboard(query):
 
 ##############################################################################################
 
-###############################    CONFIGURATION PHOTO ROTATION HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_rotation_0_keyboard")
-def photo_rotation_0_keyboard_callback(query):
-    photo_rotation_0_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_rotation_90_keyboard")
-def photo_rotation_90_keyboard_callback(query):
-    photo_rotation_90_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_rotation_180_keyboard")
-def photo_rotation_180_keyboard_callback(query):
-    photo_rotation_180_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_rotation_270_keyboard")
-def photo_rotation_270_keyboard_callback(query):
-    photo_rotation_270_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_photo_rotation_keyboard")
-def get_photo_rotation_keyboard_callback(query):
-    get_photo_rotation_keyboard(query)
-
-##############################################################################################
-
 ###############################      CONFIGURATION PHOTO ROTATION FUNCTIONS   #################################
 
 def photo_rotation_0_keyboard(query):
@@ -1698,44 +1976,6 @@ def get_photo_rotation_keyboard(query):
 
 ##############################################################################################
 
-###############################    CONFIGURATION PHOTO VFLIP HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_activate_vflip_keyboard")
-def photo_activate_vflip_keyboard_callback(query):
-    photo_activate_vflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_deactivate_vflip_keyboard")
-def photo_deactivate_vflip_keyboard_callback(query):
-    photo_deactivate_vflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_photo_vflip_keyboard")
-def get_photo_vflip_keyboard_callback(query):
-    get_photo_vflip_keyboard(query)
-
-###############################    CONFIGURATION PHOTO HFLIP HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_activate_hflip_keyboard")
-def photo_activate_hflip_keyboard_callback(query):
-    photo_activate_hflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_deactivate_hflip_keyboard")
-def photo_deactivate_hflip_keyboard_callback(query):
-    photo_deactivate_hflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_photo_hflip_keyboard")
-def get_photo_hflip_keyboard_callback(query):
-    get_photo_hflip_keyboard(query)
-
-##############################################################################################
-
 ###############################      CONFIGURATION PHOTO VFLIP FUNCTIONS   #################################
 
 def photo_activate_vflip_keyboard(query):
@@ -1773,26 +2013,6 @@ def get_photo_vflip_keyboard(query):
 
 ##############################################################################################
 
-###############################    CONFIGURATION PHOTO HFLIP HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_activate_hflip_keyboard")
-def photo_activate_hflip_keyboard_callback(query):
-    photo_activate_hflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "photo_deactivate_hflip_keyboard")
-def photo_deactivate_hflip_keyboard_callback(query):
-    photo_deactivate_hflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_photo_hflip_keyboard")
-def get_photo_hflip_keyboard_callback(query):
-    get_photo_hflip_keyboard(query)
-
-##############################################################################################
-
 ###############################      CONFIGURATION PHOTO HFLIP FUNCTIONS   #################################
 
 def photo_activate_hflip_keyboard(query):
@@ -1827,50 +2047,6 @@ def get_photo_hflip_keyboard(query):
         bot.send_message(message.chat.id, rotation_info)
     except:
         bot.send_message(message.chat.id, "Sorry, could not read the photo hflip")
-
-##############################################################################################
-
-###############################    CONFIGURATION VIDEO HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "resolution_configuration_video_keyboard")
-def resolution_configuration_video_keyboard_callback(query):
-    resolution_configuration_video_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "rotation_configuration_video_keyboard")
-def rotation_configuration_video_keyboard_callback(query):
-    rotation_configuration_video_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "vflip_configuration_video_keyboard")
-def vflip_configuration_video_keyboard_callback(query):
-    vflip_configuration_video_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "hflip_configuration_video_keyboard")
-def hflip_configuration_video_keyboard_callback(query):
-    hflip_configuration_video_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "hflip_configuration_video_keyboard")
-def hflip_configuration_video_keyboard_callback(query):
-    hflip_configuration_video_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_configuration_video_keyboard")
-def get_configuration_video_keyboard_callback(query):
-    get_configuration_video_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "datetime_configuration_video_keyboard")
-def datetime_configuration_video_keyboard_callback(query):
-    datetime_configuration_video_keyboard(query)
 
 ##############################################################################################
 
@@ -1918,32 +2094,6 @@ def get_configuration_video_keyboard(query):
         bot.send_message(message.chat.id, configuration_info)
     except:
         bot.send_message(message.chat.id, "Sorry, could not read the video configuration")
-
-##############################################################################################
-
-###############################    CONFIGURATION VIDEO RESOLUTION HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "low_video_resolution_keyboard")
-def low_video_resolution_keyboard_callback(query):
-    low_video_resolution_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "medium_video_resolution_keyboard")
-def medium_video_resolution_keyboard_callback(query):
-    medium_video_resolution_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "high_video_resolution_keyboard")
-def high_video_resolution_keyboard_callback(query):
-    high_video_resolution_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_video_resolution_keyboard")
-def get_video_resolution_keyboard_callback(query):
-    get_video_resolution_keyboard(query)
 
 ##############################################################################################
 
@@ -2000,39 +2150,6 @@ def get_video_resolution_keyboard(query):
         bot.send_message(message.chat.id, resolution_info)
     except:
         bot.send_message(message.chat.id, "Sorry, could not read the video resolution")
-
-##############################################################################################
-
-###############################    CONFIGURATION VIDEO ROTATION HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_rotation_0_keyboard")
-def video_rotation_0_keyboard_callback(query):
-    video_rotation_0_keyboard(query)
-
-##############################################################################################
-
-
-@bot.callback_query_handler(lambda query: query.data == "video_rotation_90_keyboard")
-def video_rotation_90_keyboard_callback(query):
-    video_rotation_90_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_rotation_180_keyboard")
-def video_rotation_180_keyboard_callback(query):
-    video_rotation_180_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_rotation_270_keyboard")
-def video_rotation_270_keyboard_callback(query):
-    video_rotation_270_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_video_rotation_keyboard")
-def get_video_rotation_keyboard_callback(query):
-    get_video_rotation_keyboard(query)
 
 ##############################################################################################
 
@@ -2094,26 +2211,6 @@ def get_video_rotation_keyboard(query):
 
 ##############################################################################################
 
-###############################    CONFIGURATION VIDEO VFLIP HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_activate_vflip_keyboard")
-def video_activate_vflip_keyboard_callback(query):
-    video_activate_vflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_deactivate_vflip_keyboard")
-def video_deactivate_vflip_keyboard_callback(query):
-    video_deactivate_vflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_video_vflip_keyboard")
-def get_video_vflip_keyboard_callback(query):
-    get_video_vflip_keyboard(query)
-
-##############################################################################################
-
 ###############################      CONFIGURATION VIDEO VFLIP FUNCTIONS   #################################
 
 def video_activate_vflip_keyboard(query):
@@ -2148,26 +2245,6 @@ def get_video_vflip_keyboard(query):
         bot.send_message(message.chat.id, rotation_info)
     except:
         bot.send_message(message.chat.id, "Sorry, could not read the video vflip")
-
-##############################################################################################
-
-###############################    CONFIGURATION VIDEO HFLIP HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_activate_hflip_keyboard")
-def video_activate_hflip_keyboard_callback(query):
-    video_activate_hflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_deactivate_hflip_keyboard")
-def video_deactivate_hflip_keyboard_callback(query):
-    video_deactivate_hflip_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_video_hflip_keyboard")
-def get_video_hflip_keyboard_callback(query):
-    get_video_hflip_keyboard(query)
 
 ##############################################################################################
 
@@ -2208,26 +2285,6 @@ def get_video_hflip_keyboard(query):
 
 ##############################################################################################
 
-###############################    CONFIGURATION VIDEO DATETIME HANDLERS   #################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_activate_datetime_keyboard")
-def video_activate_datetime_keyboard_callback(query):
-    video_activate_datetime_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "video_deactivate_datetime_keyboard")
-def video_deactivate_datetime_keyboard_callback(query):
-    video_deactivate_datetime_keyboard(query)
-
-##############################################################################################
-
-@bot.callback_query_handler(lambda query: query.data == "get_video_datetime_keyboard")
-def get_video_datetime_keyboard_callback(query):
-    get_video_datetime_keyboard(query)
-
-##############################################################################################
-
 ###############################      CONFIGURATION VIDEO DATETIME FUNCTIONS   #################################
 
 def video_activate_datetime_keyboard(query):
@@ -2263,7 +2320,8 @@ def get_video_datetime_keyboard(query):
     except:
         bot.send_message(message.chat.id, "Sorry, could not read the video showDatetime")
 
-##############################################################################################
+
+######################################  END INTERFACE  ######################################
 
 logger = TelegramBotAgentLogger()
 
