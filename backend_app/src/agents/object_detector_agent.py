@@ -79,6 +79,19 @@ def load_image_into_numpy_array(image):
 
 ##############################################################################################
 
+""" Echo function to check api status
+
+Returns echo message
+
+"""
+
+
+@app.route("/api/echo", methods=['GET'])
+def echo_api():
+   return jsonify({'status': 'True'})
+
+##############################################################################################
+
 """
     API function that makes a response with a list of objects detected in the photo path
     received.
