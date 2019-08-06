@@ -78,6 +78,20 @@ def authentication_required(f):
 
 ##############################################################################################
 
+
+""" Echo function to check api status
+
+Returns echo message
+
+"""
+
+@app.route("/api/echo", methods=['GET'])
+def echo_api():
+   return jsonify({'status': 'True'})
+
+
+##############################################################################################
+
 """ Creates an asynchronous task to take a photo
 
 Returns the status and identifier of the task
