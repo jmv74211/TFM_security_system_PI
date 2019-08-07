@@ -1,9 +1,6 @@
 import unittest
-import os
 from agents.api_agent import *
 import getpass  # Get username like whoami
-
-import agents.api_agent as api
 
 """
     API agent unit tests

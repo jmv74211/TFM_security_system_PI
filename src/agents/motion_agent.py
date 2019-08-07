@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from flask import Flask, jsonify
+from flask import Flask
 from lib.flask_celery import make_celery
 from time import sleep
 import requests

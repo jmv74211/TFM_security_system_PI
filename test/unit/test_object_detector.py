@@ -13,7 +13,7 @@ class TestObjectDetector(unittest.TestCase):
     def test1_get_detector_result(self):
 
         # Image without people
-        image_1_path = os.path.join(settings.ROOT_DIR, 'modules','object_detector','test_images','1.jpg')
+        image_1_path = os.path.join(settings.ROOT_DIR, 'modules', 'object_detector', 'test_images', '1.jpg')
         # Image with people
         image_2_path = os.path.join(settings.ROOT_DIR, 'modules', 'object_detector', 'test_images', '2.jpg')
 

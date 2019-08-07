@@ -1,7 +1,6 @@
 import unittest
 import os
 import getpass  # Get username like whoami
-import settings
 
 from modules.logger import *
 

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-import sys
 import io
 import os
-import shutil
 from subprocess import Popen, PIPE
 from string import Template
 from struct import Struct

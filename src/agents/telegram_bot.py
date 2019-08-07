@@ -1,5 +1,5 @@
 import telebot  # Telegram API
-import requests, json  # Imports to make an decode requests
+import requests  # Imports to make an decode requests
 from time import sleep  # sleep
 from functools import wraps  # Import to use decoration functions
 import yaml  # Import to read the configuration file

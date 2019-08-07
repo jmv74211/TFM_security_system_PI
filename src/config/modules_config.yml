@@ -1,0 +1,11 @@
+photo:
+  hflip: false
+  resolution: HIGH
+  rotation: 0
+  vflip: false
+video:
+  hflip: false
+  resolution: HIGH
+  rotation: 0
+  showDatetime: false
+  vflip: false

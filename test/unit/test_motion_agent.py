@@ -1,5 +1,4 @@
 import unittest
-import os
 
 from agents.motion_agent import *
 

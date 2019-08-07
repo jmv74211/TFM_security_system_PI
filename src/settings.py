@@ -2,7 +2,7 @@ import os
 
 ##################    SERVER CONFIGURATION    ##################
 
-# Root base project dir (src folder)
+# Root base src dir
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ##################    STORAGE CONFIGURATION   ##################
@@ -11,13 +11,13 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGS_FILE_PATH = os.path.join(ROOT_DIR,'..', 'logs')
 
 # PATH where save photo and video files.
-PHOTO_FILES_PATH = "/home/jmv74211/Escritorio/security_files/photos"
-VIDEO_FILES_PATH = "/home/jmv74211/Escritorio/security_files/videos"
-ALERTS_FILES_PATH = "/home/jmv74211/Escritorio/security_files/alerts"
+PHOTO_FILES_PATH = os.path.join(ROOT_DIR,'..', 'capturated_files','photos')
+VIDEO_FILES_PATH = os.path.join(ROOT_DIR,'..', 'capturated_files','videos')
+ALERTS_FILES_PATH = os.path.join(ROOT_DIR,'..', 'capturated_files','alerts')
 
 # False positive alerts directory: Here it will be saved photo files in which detector agent
 # has not detected a person.
-FALSE_POSITIVE_ALERTS_FILES_PATH = "/home/jmv74211/Escritorio/security_files/alerts/false_positive"
+FALSE_POSITIVE_ALERTS_FILES_PATH = os.path.join(ROOT_DIR,'..', 'capturated_files','alerts','false_positive')
 
 ##################    CONFIGURATION FILES PATH   ##################
 
@@ -37,8 +37,8 @@ API_AGENT_RUNNING_PORT = 10000
 # DEBUG MODE
 DEBUG = True
 
-# Set here your RAW password
-API_PASSWORD = os.environ.get('TFM_PASSWORD')
+# Set here your RAW API agent password
+API_PASSWORD = os.environ.get('SECURITY_PASSWORD')
 
 # rabbit-mq server
 API_CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
