@@ -3,11 +3,7 @@ import getpass  # Get username like whoami
 from agents.object_detector_agent import *
 import json
 import os
-import time
-import requests
-import glob
 import settings
-
 
 class TestObjectDetectorAgent(unittest.TestCase):
 
@@ -25,6 +21,18 @@ class TestObjectDetectorAgent(unittest.TestCase):
         self.image_1_path = os.path.join(settings.ROOT_DIR, 'modules', 'object_detector', 'test_images', '1.jpg')
 
         self.image_2_path = os.path.join(settings.ROOT_DIR, 'modules', 'object_detector', 'test_images', '2.jpg')
+
+    ##############################################################################################
+
+    def test0_check_object_detector_agent_status(self):
+
+        try:
+            req = self.app.get('/api/echo')
+        except:
+            print("Object detector agent is not running.")
+            raise
+
+        self.assertEqual(req.status_code, 200)
 
     ##############################################################################################
 
