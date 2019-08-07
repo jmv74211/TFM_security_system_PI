@@ -138,7 +138,7 @@ class Video:
         video_name: Video name that has been recorded and converted to mp4.
     """
 
-    def record_video(self, record_time=10, showDatetime=False, convert_video_to_mp4=True):
+    def record_video(self, record_time=10, convert_video_to_mp4=True):
 
         video_name = self.file_path + "/" + self.get_file_name()
 
@@ -148,7 +148,7 @@ class Video:
         elif record_time < 0:
             record_time = 5
 
-        if showDatetime:
+        if self.showDatetime:
             self.camera.annotate_background = Color('black')
             self.camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
