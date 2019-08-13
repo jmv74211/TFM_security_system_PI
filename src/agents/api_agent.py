@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, logging  # Import to use web service
+from flask import Flask, request, jsonify  # Import to use web service
+import logging
 import yaml  # Import to read the configuration file information
 import settings  # Import setting info
 from modules.photo import Photo  # Import Photo module
@@ -586,9 +587,8 @@ def check_status_streaming_server():
 ##############################################################################################
 
 if __name__ == "__main__":
+    # Add a logger to api agent
     api_logger = APIAgentLogger()
-
-    # Add a api agent handler to flask logger.
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.DEBUG)
     log.addHandler(api_logger.get_file_module_handler())
