@@ -5,7 +5,8 @@ from distutils.version import StrictVersion
 from PIL import Image
 import settings
 from modules.logger import DetectorObjectAgentLogger
-from flask import Flask, request, jsonify, logging  # Import to use web service
+import logging
+from flask import Flask, request, jsonify # Import to use web service
 
 if StrictVersion(tf.__version__) < StrictVersion('1.12.0'):
     raise ImportError('Please upgrade your TensorFlow installation to v1.12.*.')
@@ -151,10 +152,8 @@ def get_detector_result(image_path):
 ##############################################################################################
 
 if __name__ == "__main__":
-
+    # Add a logger to api agent
     detector_agent_logger = DetectorObjectAgentLogger()
-
-    # Add a detector object agent handler to flask logger.
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.DEBUG)
     log.addHandler(detector_agent_logger.get_file_module_handler())
