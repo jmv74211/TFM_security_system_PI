@@ -122,7 +122,6 @@ def services_are_running(f):
             return -1
 
         if settings.DETECTOR_AGENT_STATUS:
-
             object_detector_agent_address = "{}:{}".format(settings.DETECTOR_AGENT_IP_ADDRESS, settings.DETECTOR_AGENT_RUNNING_PORT)
             object_detector_agent_url = os.path.join(object_detector_agent_address, "api", "echo")
 
@@ -131,8 +130,8 @@ def services_are_running(f):
             except:
                 bot.send_message(chat_id, "\u274C Object detector agent is off and is enabled in the configuration. "
                                                   "Please activate the agent service in your server or deactivate it "
-                                                  "in \u2B50 Mode -> \u2B55 Toggle detector status")
-            return -1
+                                                  "in /U+1F680 Mode -> \u2B55 Toggle detector status")
+                return -1
 
         return f(*args, **kwargs)
 
@@ -162,20 +161,29 @@ Returns:  Datetime info. Example: (2019-07-30__11:04:21)
 
 
 def get_file_datetime(filename):
-    # Remove extension file
-    data_filtered = filename.replace('.jpg', '')
-    data_filtered = data_filtered.replace('.mp4', '')
 
-    # split by separator char
-    data_filtered = data_filtered.split("_")
+    if '.jpg' in filename:
+        # Remove extension file
+        data_filtered = filename.replace('.jpg', '')
+        # Split filename by its type.
+        data_filtered = data_filtered.split("IMG_")
 
-    day = data_filtered[2][6:8]
-    month = data_filtered[2][4:6]
-    year = data_filtered[2][:4]
+    elif '.mp4' in filename:
+        # Remove extension file
+        data_filtered = filename.replace('.mp4', '')
+        # Split filename by its type.
+        data_filtered = data_filtered.split("VID_")
 
-    hour = data_filtered[3][:2]
-    minutes = data_filtered[3][2:4]
-    seconds = data_filtered[3][4:6]
+    # Split filter data in date --> [0]  time --> [1]
+    data_filtered = data_filtered[1].split("_")
+
+    day = data_filtered[0][4:6]
+    month = data_filtered[0][6:8]
+    year = data_filtered[0][:4]
+
+    hour = data_filtered[1][:2]
+    minutes = data_filtered[1][2:4]
+    seconds = data_filtered[1][4:6]
 
     time = "{}-{}-{}__{}:{}:{}".format(year, month, day, hour, minutes, seconds)
 
@@ -522,7 +530,7 @@ def get_username_bot(message):
 
 
 @bot.message_handler(commands=['credentials'])
-def get_credentials_bot(message):
+def get_user_credentials(message):
     chat_id = message.chat.id
 
     bot.send_message(chat_id, "Your user id is {} and your username is {}"
@@ -530,6 +538,27 @@ def get_credentials_bot(message):
 
 
 ##############################################################################################
+
+
+"""
+    Return telegram bot credentials
+"""
+
+
+@bot.message_handler(commands=['bot'])
+def get_bot_credentials(message):
+    chat_id = message.chat.id
+
+    bot_info = bot.get_me()
+    bot_username = bot_info.username
+    bot_id = bot_info.id
+    bot_credentials = "Bot username: {}\nBot id: {}".format(bot_username, bot_id)
+
+    bot.send_message(chat_id, bot_credentials)
+
+
+##############################################################################################
+
 
 """
     Take a photo and send it using /photo command
@@ -951,16 +980,17 @@ def start_keyboard(message):
 ###############################     MODE KEYBOARD  ##########################################
 
 inline_start_keyboard = types.InlineKeyboardMarkup()
-inline_start_keyboard_btn1 = types.InlineKeyboardButton("\u2B50 Mode", callback_data="mode_keyboard")
+inline_start_keyboard_btn1 = types.InlineKeyboardButton("\U0001F680 Mode", callback_data="mode_keyboard")
 inline_start_keyboard_btn2 = types.InlineKeyboardButton("\U0001F527 Configuration",
                                                         callback_data="configuration_keyboard")
 inline_start_keyboard_btn3 = types.InlineKeyboardButton("\U0001F4BB Commands", callback_data="commands_keyboard")
 inline_start_keyboard_btn4 = types.InlineKeyboardButton("\U0001F4C4 Go to documentation",
                                                         url="https://github.com/jmv74211/TFM_security_system_PI")
+inline_start_keyboard_btn5 = types.InlineKeyboardButton("\U0001F6A9 Utils", callback_data="utils_keyboard")
 
-inline_start_keyboard.row(inline_start_keyboard_btn1, inline_start_keyboard_btn2)
+inline_start_keyboard.row(inline_start_keyboard_btn1)
+inline_start_keyboard.row(inline_start_keyboard_btn2, inline_start_keyboard_btn5)
 inline_start_keyboard.row(inline_start_keyboard_btn3, inline_start_keyboard_btn4)
-
 ###############################     MODE KEYBOARD  ##########################################
 
 inline_mode_keyboard = types.InlineKeyboardMarkup()
@@ -1186,6 +1216,14 @@ inline_video_datetime_keyboard_btn3 = types.InlineKeyboardButton("\u2B55 Show cu
 inline_video_datetime_keyboard.row(inline_video_datetime_keyboard_btn1, inline_video_datetime_keyboard_btn2)
 inline_video_datetime_keyboard.row(inline_video_datetime_keyboard_btn3)
 
+###############################    UTILS KEYBOARD  #################################
+
+inline_utils_keyboard = types.InlineKeyboardMarkup()
+inline_utils_keyboard_btn1 = types.InlineKeyboardButton("\U0001F6BB User credentials",
+                                                                 callback_data="user_credentials_keyboard")
+inline_utils_keyboard_btn2 = types.InlineKeyboardButton("\U0001F47D Bot credentials",callback_data="bot_credentials_keyboard")
+
+inline_utils_keyboard.row(inline_utils_keyboard_btn1, inline_utils_keyboard_btn2)
 
 ##############################################################################################
 #                                                                                            #
@@ -1210,6 +1248,12 @@ def configuration_keyboard_callback(query):
 @bot.callback_query_handler(lambda query: query.data == "commands_keyboard")
 def configuration_keyboard_callback(query):
     commands_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "utils_keyboard")
+def utils_keyboard_callback(query):
+    utils_keyboard(query)
 
 ##############################################################################################
 
@@ -1643,6 +1687,18 @@ def get_video_datetime_keyboard_callback(query):
 
 ##############################################################################################
 
+@bot.callback_query_handler(lambda query: query.data == "user_credentials_keyboard")
+def user_credentials_keyboard_callback(query):
+    get_user_credentials_keyboard(query)
+
+##############################################################################################
+
+@bot.callback_query_handler(lambda query: query.data == "bot_credentials_keyboard")
+def get_bot_credentials_keyboard_callback(query):
+    get_bot_credentials_keyboard(query)
+
+##############################################################################################
+
 ##############################################################################################
 #                                                                                            #
 #                             BOT INLINE KEYBOARD RESPONSE FUNCTIONS                         #
@@ -1653,7 +1709,7 @@ def get_video_datetime_keyboard_callback(query):
 
 def mode_keyboard(query):
     chat_id = query.message.chat.id
-    bot.send_message(chat_id, "\u2B50 Mode selection: Choose one: ", reply_markup=inline_mode_keyboard)
+    bot.send_message(chat_id, "\U0001F680 Mode selection: Choose one: ", reply_markup=inline_mode_keyboard)
 
 ##############################################################################################
 
@@ -1698,9 +1754,16 @@ By default, the duration is 10 seconds.
 /id: Returns your telegram user id.
 /username: Returns your telegram username.
 /credentials: Returns your telegram user id and username.
+/bot: Returns telegram bot user id and username.
 """
 
     bot.send_message(chat_id, command_message)
+
+##############################################################################################
+
+def utils_keyboard(query):
+    chat_id = query.message.chat.id
+    bot.send_message(chat_id, "\U0001F6A9 Utils selection:", reply_markup=inline_utils_keyboard)
 
 ##############################################################################################
 
@@ -2327,6 +2390,31 @@ def get_video_datetime_keyboard(query):
     except:
         bot.send_message(message.chat.id, "Sorry, could not read the video showDatetime")
 
+
+##############################################################################################
+
+###############################      UTILS FUNCTIONS   #################################
+
+def get_user_credentials_keyboard(query):
+    chat_id = query.message.chat.id
+
+    username = query.from_user.username
+    user_id = query.from_user.id
+    user_credentials = "Your telegram username: {}\nYour telegram user id: {}".format(username, user_id)
+
+    bot.send_message(chat_id, user_credentials)
+
+##############################################################################################
+
+def get_bot_credentials_keyboard(query):
+    chat_id = query.message.chat.id
+
+    bot_info = bot.get_me()
+    bot_username = bot_info.username
+    bot_id = bot_info.id
+    bot_credentials = "Bot username: {}\nBot id: {}".format(bot_username, bot_id)
+
+    bot.send_message(chat_id, bot_credentials)
 
 ######################################  END INTERFACE  ######################################
 

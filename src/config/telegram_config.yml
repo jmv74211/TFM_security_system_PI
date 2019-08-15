@@ -1,0 +1,24 @@
+---
+
+# Note: If you don't know the telegram credentials you can consult them using the bot:
+#   Commands:
+#              /credentials: Shows your telegram username and user id.
+#              /bot: Shows the telegram bot username and user id.
+#
+#   Buttons interface:
+#             utils: You can query your credentials using that button.
+
+telegram_bot:
+    telegram_username: "YOUR_TELEGRAM_USERNAME"
+    telegram_user_id: YOUR_TELEGRAM_USER_ID
+    api_token: "YOUR_TELEGRAM_API_TOKEN"
+    bot_username: "YOUR_TELEGRAM_BOT_USERNAME"
+    bot_user_id: YOUR_TELEGRAM_BOT_USER_ID
+
+api_agent_credentials:
+    api_agent_user: "YOUR_API_USER"
+    api_agent_password: "YOUR_API_PASSWORD"
+
+
+
+
