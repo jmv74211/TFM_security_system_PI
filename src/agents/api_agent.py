@@ -504,6 +504,8 @@ def take_photo(photo_path=settings.PHOTO_FILES_PATH):
     camera_photo = Photo(file_path=photo_path, resolution=photo_config['resolution'],
                          vflip=photo_config['vflip'], hflip=photo_config['hflip'])
     camera_photo.rotate(photo_config['rotation'])
+    camera_photo.set_hflip(status = photo_config['hflip'])
+    camera_photo.set_vflip(status = photo_config['vflip'])
     photo_file_path = camera_photo.take_photo()
     camera_photo.close()
 
@@ -526,6 +528,8 @@ def record_video(record_time, video_path=settings.VIDEO_FILES_PATH):
                          hflip=video_config['hflip'])
 
     video_camera.rotate(video_config['rotation'])
+    video_camera.set_hflip(status= video_config['hflip'])
+    video_camera.set_vflip(status= video_config['vflip'])
 
     # Record max long is 1 hour
     if record_time > 3600:
