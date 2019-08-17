@@ -7,7 +7,13 @@ AGENTS_PATH="src/agents"
 cd $AGENTS_PATH
 
 function print_parameters {
-    echo "Need one of the following parameters"
+
+    echo -e "Usage: app.sh <arg>"
+    echo -e "Common args:"
+    echo -e "     start          Launches the necessary processes to start the application"
+    echo -e "     stop           Stops all application processes"
+    echo -e "     status         Displays the status of application processes"
+
 }
 
 function kill_process {
@@ -38,49 +44,65 @@ if [ $# -eq 1 ]; then
 
     "start")
 
-        echo "======================================================== \n"
-        echo "Starting api agent... \n"
-        echo "======================================================== \n"
+        echo "========================================================"
+        echo "Starting api agent agent worker..."
+        echo "========================================================"
+
+        celery -A api_agent.celery worker -n api_agent -l INFO -c 1 -Q api_agent > /dev/null 2>&1 & disown
+
+        sleep 2
+
+        echo "========================================================"
+        echo "Starting celery motion agent worker..."
+        echo "========================================================"
+
+        celery -A motion_agent.celery worker -n motion_agent -l INFO -c 1 -Q motion_agent > /dev/null 2>&1 & disown
+
+        sleep 1
+
+        echo "========================================================"
+        echo "Starting api agent..."
+        echo "========================================================"
 
         python3 api_agent.py > /dev/null 2>&1 & disown
 
         sleep 3
 
-        echo "======================================================== \n"
-        echo "Starting telegram bot... \n"
-        echo "======================================================== \n"
+        echo "========================================================"
+        echo "Starting telegram bot..."
+        echo "========================================================"
 
         python3 telegram_bot.py > /dev/null 2>&1 & disown
 
         sleep 2
 
-        echo "======================================================== \n"
-        echo "Starting object detector agent... \n"
-        echo "======================================================== \n"
+        echo "========================================================"
+        echo "Starting object detector agent..."
+        echo "========================================================"
 
         python3 object_detector_agent.py > /dev/null 2>&1 & disown
         ;;
 
     "stop")
 
-        echo "======================================================== \n"
-        echo "Stopping app process... \n"
-        echo "======================================================== \n"
+        echo "========================================================"
+        echo "Stopping app process..."
+        echo "========================================================"
 
-        kill_process "object_detector_agent.py"
-        kill_process "api_agent.py"
-        kill_process "telegram_bot.py"
+        kill_process api_agent.celery
+        kill_process motion_agent.celery
+        kill_process object_detector_agent.py
+        kill_process api_agent.py
+        kill_process telegram_bot.py
         ;;
 
     "status")
 
-         object_detector=`ps -eaf | grep object_detector_agent.py | grep -v grep | awk '{print $2}'`
-         api_agent=`ps -eaf | grep api_agent.py | grep -v grep | awk '{print $2}'`
-         telegram_bot=`ps -eaf | grep telegram_bot.py | grep -v grep | awk '{print $2}'`
-
-         check_process object_detector_agent.py
-         check_process api_agent.py
-         check_process telegram_bot.py
+        check_process object_detector_agent.py
+        check_process object_detector_agent.py
+        check_process object_detector_agent.py
+        check_process api_agent.py
+        check_process telegram_bot.py
         ;;
     *)
         print_parameters
