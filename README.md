@@ -49,6 +49,8 @@ As hardware devices to create our security system, we need the following compone
 When we talk about raspberry PI, we mean the set of elements necessary for it to work (Normally, it's always included in 
 a pack), such as they are the power supply unit and SD card where we have installed an SO (in this case Raspbian 9).
 
+If you need to buy the components, you can check this [link](https://github.com/jmv74211/TFM_security_system_PI/tree/master/doc/hardware). to see the components that it has been purchased for this project, their price and the purchase link.
+
 ### 2.1.1 Hardware installation Guide
 
 - First, you need to connect the raspicam to the raspberry PI and configure it to detect the camera. If you don't know how to do it, you can watch the following tutorial: https://thepihut.com/blogs/raspberry-pi-tutorials/16021420-how-to-install-use-the-raspberry-pi-camera
@@ -76,7 +78,7 @@ In the following image, you can see the architecture of the application.
 </p>
 
 
-> Note: You can see more information [here](https://github.com/jmv74211/TFM_security_system_PI/tree/master/backend_app).
+> Note: You can see more information [here](https://github.com/jmv74211/TFM_security_system_PI/tree/master/src).
 
 ### 2.2.1 App installation dependencies
 
@@ -102,7 +104,7 @@ the case of detecting a person in the image captured during the alert.
     - Protobuf
     - Python3 dependencies
     
-> Note: You can see the entire installation process in detail [here](https://github.com/jmv74211/TFM_security_system_PI/blob/master/doc/installation/backend_installation_guide.md).
+> Note: You can see the entire installation process in detail [here](https://github.com/jmv74211/TFM_security_system_PI/blob/master/doc/installation).
 
 ### 2.2.2 App deployment
 
@@ -452,3 +454,17 @@ commands with which you can interact with the bot, and may be able to speed up s
 ## 3.5 Documentation
 
 This button redirects you to the application documentation page.
+
+---
+
+# 4. Advanced: Connect a front-end with the API agent.
+
+In this version of the application, a telegram bot is used to interact with the main API of the application, and show 
+the information to the user.
+
+As alternative applications to telegram, any type of front-end application can be built to obtain and show the data to 
+the user making use of its API. In this case, you can do it without any type of problem, since it would be enough to 
+connect this front-end to the main API, replacing the telegram bot.
+
+If you plan to do this, it might help you to consult the [API documentation](https://github.com/jmv74211/TFM_security_system_PI/tree/master/doc/api), which shows all the requests that can be 
+made, their answers and some examples of use.
