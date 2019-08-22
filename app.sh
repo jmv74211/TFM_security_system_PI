@@ -2,6 +2,7 @@
 
 ####################### LOCATION VARS ###########################
 
+OBJECT_DETECTOR_INSTALLED="false"
 AGENTS_PATH="src/agents"
 
 cd $AGENTS_PATH
@@ -52,13 +53,16 @@ if [ $# -eq 1 ]; then
 
         sleep 2
 
-        echo "========================================================"
-        echo "Starting celery motion agent worker..."
-        echo "========================================================"
+        if [[ $OBJECT_DETECTOR_INSTALLED ==  "true" ]]; then
 
-        celery -A motion_agent.celery worker -n motion_agent -l INFO -c 1 -Q motion_agent > /dev/null 2>&1 & disown
+            echo "========================================================"
+            echo "Starting celery motion agent worker..."
+            echo "========================================================"
 
-        sleep 1
+            celery -A motion_agent.celery worker -n motion_agent -l INFO -c 1 -Q motion_agent > /dev/null 2>&1 & disown
+
+            sleep 1
+        fi
 
         echo "========================================================"
         echo "Starting api agent..."
@@ -76,11 +80,14 @@ if [ $# -eq 1 ]; then
 
         sleep 2
 
-        echo "========================================================"
-        echo "Starting object detector agent..."
-        echo "========================================================"
+        if [[ $OBJECT_DETECTOR_INSTALLED ==  "true" ]]; then
 
-        python3 object_detector_agent.py > /dev/null 2>&1 & disown
+            echo "========================================================"
+            echo "Starting object detector agent..."
+            echo "========================================================"
+
+            python3 object_detector_agent.py > /dev/null 2>&1 & disown
+        fi
         ;;
 
     "stop")
@@ -90,17 +97,26 @@ if [ $# -eq 1 ]; then
         echo "========================================================"
 
         kill_process api_agent.celery
-        kill_process motion_agent.celery
-        kill_process object_detector_agent.py
         kill_process api_agent.py
         kill_process telegram_bot.py
+
+        if [[ $OBJECT_DETECTOR_INSTALLED ==  "true" ]]; then
+
+            kill_process motion_agent.celery
+            kill_process object_detector_agent.py
+        fi
         ;;
 
     "status")
 
-        check_process object_detector_agent.py
-        check_process object_detector_agent.py
-        check_process object_detector_agent.py
+        check_process api_agent.celery
+
+        if [[ $OBJECT_DETECTOR_INSTALLED ==  "true" ]]; then
+
+            check_process motion_agent.celery
+            check_process object_detector_agent.py
+        fi
+
         check_process api_agent.py
         check_process telegram_bot.py
         ;;
@@ -112,4 +128,3 @@ if [ $# -eq 1 ]; then
 else
     print_parameters
 fi
-
