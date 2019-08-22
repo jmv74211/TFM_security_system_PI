@@ -85,7 +85,10 @@ has been obtained in the previous step).
     > **Note**: If you don't know all the data, don't worry, they can be obtained later. The mandatory data are `api_token`, 
     `api_agent_user` and `api_agent_password`. (Note that in this case it is necessary to enter the password in raw format,
      (unencrypted)).
- 
+
+- If you have done a **full installation** (installed the necessary components for the object detector agent) then you have to set the value 
+ of the `OBJECT_DETECTOR_INSTALLED` variable to *"true"* in app.sh to be able to start the object detection agent when running the application.
+
  - The last step of the configuration process is to modify the 
  [settings file](https://github.com/jmv74211/TFM_security_system_PI/blob/master/src/settings.py). 
  In this file, we can modify the general configuration of the application, such as IP addresses of services, ports...
@@ -112,6 +115,10 @@ has been obtained in the previous step).
 Once the application is installed and configured, we can execute it using the
  [app.sh](https://github.com/jmv74211/TFM_security_system_PI/blob/master/app.sh) script located in the root 
 directory of the application.
+
+> **Note:** Remember that if you have done a complete installation (necessary components for the object detector agent) you have 
+to set the value of the `OBJECT_DETECTOR_INSTALLED` variable to "true" in [app.sh](https://github.com/jmv74211/TFM_security_system_PI/blob/master/app.sh)
+to be able to start all the services.
 
 ```bash
 $ sudo chmod u+x ./app.sh
