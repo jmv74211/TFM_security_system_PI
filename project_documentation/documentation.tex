@@ -34,13 +34,19 @@
 % ------------------------------------------------------- 
 
 % Paquetes para imprimir código fuente
-\usepackage[cache=false]{minted}
+%\usepackage[cache=false]{minted}
 
 \usepackage{subcaption}
 
 \usepackage[table,xcdraw]{xcolor} % Color de tabla
 
-\usepackage{movie15}
+%\usepackage{movie15}
+
+% Para símbolos de comprobación y x.
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{ \color{green} \ding{51}}%
+\newcommand{\xmark}{ \color{red}\ding{55}}%
+
 
 % -------------------------------------------------------  
 
@@ -98,14 +104,24 @@
 
 \input{src/1_introduccion}
 
-%\input{src/2_planificacion}
+\newpage
+
+\input{src/2_planificacion}
+
+\newpage
+
+\input{src/3_analisis_mercado}
+
+\newpage
+
+\input{src/4_tecnologias_usadas}
 
 \newpage
 
 \input{src/referencias}
 
-
-
 \end{document}
+
+
 
 % ###################	FIN DEL DOCUMENTO ###################
