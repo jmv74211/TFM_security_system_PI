@@ -1,0 +1,38 @@
+
+
+\fancypagestyle{miEstilo5}{
+   \lhead{5. Descripción de la aplicación}
+   %\chead{1. Introducción}
+   \rhead{Página \thepage}
+   \lfoot{}
+   \cfoot{}
+   \rfoot{}
+}
+
+\pagestyle{miEstilo5}
+
+\section{Descripción de la aplicación: SIVIRA}
+
+El sistema de videovigilancia con una Raspberry PI (\texttt{SIVIRA}) es una aplicación que nos permite construir un sistema de seguridad basado en la videovigilancia de bajo coste utilizando una Raspberry PI , una cámara y un sensor de movimiento.
+
+La idea es poder controlar el sistema a través de una aplicación móvil, con la que el usuario pueda conectarse desde cualquier parte y tener acceso a su información y sistema de seguridad. Las funciones principales de este sistema son las siguientes:
+
+\begin{itemize}
+\item \textbf{Sistema automático} de alertas generadas al capturar el movimiento.
+\item \textbf{Sistema manual} para grabar vídeo o capturar una foto instantáneamente.   
+\item \textbf{Sistema de streaming} para visualizar la imagen en tiempo real.
+\end{itemize}
+
+Además, podemos realizar configuraciones personalizadas a la cámara, como por ejemplo, cambiar la resolución, rotación... y la opción de poder activar un agente que filtre las alertas automáticas, generando únicamente alertas cuando se detecta a una persona en una imagen (evitar falsos positivos).
+
+\input{src/5.1_arquitectura_aplicacion}
+
+\input{src/5.2_descripcion_componentes}
+
+\input{src/5.3_interaccion}
+
+\input{src/5.4_medidas_seguridad}
+
+\input{src/5.5_interfaz_usuario}
+
+\input{src/5.6_descripcion_archivos_directorios}

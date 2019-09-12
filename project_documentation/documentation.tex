@@ -30,7 +30,7 @@
 
 % Paquetes de idioma
 \usepackage[utf8]{inputenc}
-\usepackage[spanish,english,es-tabla]{babel} % English para el abstract
+\usepackage[english,spanish,es-tabla]{babel} % English para el abstract
 % ------------------------------------------------------- 
 
 % Paquetes para imprimir código fuente
@@ -47,6 +47,11 @@
 \newcommand{\cmark}{ \color{green} \ding{51}}%
 \newcommand{\xmark}{ \color{red}\ding{55}}%
 
+\usepackage{eurosym} % Para símbolo €
+
+% Paquetes para tree. Gráfico jerárquico
+\usepackage{tikz}
+\usetikzlibrary{trees}
 
 % -------------------------------------------------------  
 
@@ -63,6 +68,17 @@
 \usepackage{lipsum}
 
 \usepackage{fancyhdr}
+
+%\usepackage[toc,page]{appendix}
+
+\usepackage[spanish]{babel}
+\usepackage{appendix}
+
+\addto\captionsspanish{%
+  \renewcommand\appendixname{Anexo}
+  \renewcommand\appendixpagename{Anexos}
+}
+
 
 \usepackage{float} % para controlar la situación de los entornos flotantes
 
@@ -106,6 +122,10 @@
 
 \newpage
 
+\tableofcontents
+
+\newpage
+
 \input{src/1_introduccion}
 
 \newpage
@@ -122,11 +142,15 @@
 
 \newpage
 
-\input{src/5_descripcion_aplicacion}
+\input{src/5.0_descripcion_aplicacion}
 
 \newpage
 
 \input{src/referencias}
+
+\newpage
+
+\input{src/anexo}
 
 \end{document}
 

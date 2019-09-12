@@ -1,0 +1,126 @@
+\section{Instalación y despliegue de la aplicación}
+
+En esta sección se va a hacer una guía sobre los pasos necesarios para llevar a cabo una correcta instalación de servicios y dependencias para la aplicación \texttt{SIVIRA}.
+
+\subsection{Instalación mínima}
+
+Se instalarán los componentes mínimos y necesarios para que la aplicación pueda ejecutarse correctamente. Estos son:
+
+\begin{itemize}
+\item RabbitMQ.
+\item SQLite3.
+\item Dependencias de Python3.
+\item Dependencias para el servidor de streaming.
+\end{itemize}
+
+
+\textbf{Servicio RabbitMQ}
+
+RabbitMQ es un broker de mensajes de código abierto. Es necesario para poder gestionar las colas de las tareas asíncronas de la aplicación utilizadas por \texttt{celery}.
+
+Se puede instalar fácilmente usando el siguiente comando:
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# sudo apt-get install rabbitmq-server
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+Por defecto, \texttt{RabbitMQ} escuchará en el puerto 5672 en todas las interfaces disponibles. Puede comprobar si el servicio está disponible con:
+
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# sudo service rabbitmq-server status
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+\textbf{SQLite3}
+
+Para almacenar los estados de las tareas asíncronas, es necesario especificar un backend de almacenamiento. En este caso, se ha seleccionado \texttt{SQLite} ya que es muy ligero y fácil de usar y configurar.
+
+Puede instalar fácilmente este servicio, usando el comando:
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# sudo apt-get install sqlite3
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+Una vez instalado, compruebe que puede acceder al terminal sqlite con el comando:
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# sqlite3
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+\textbf{Dependencias de Python}
+
+Para instalar las dependencias de Python, se recomienda crear un entorno virtual. Puede crear uno rápidamente usando el comando:
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# python3 -m venv ./venv
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+A continuación, puede activar ese entorno utilizando:
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# source venv/bin/activate
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+Después, puede instalar todas las dependencias necesarias utilizando el siguiente comando:
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# pip3 install -r minium_requirements.txt
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+\textbf{Dependencias para el servidor de streaming}
+
+Para la transmisión del vídeo en tiempo real, es necesario instalar el siguiente paquete de códecs para websockets.
+
+\vspace{-1.4cm}
+
+\begin{verbatim}
+
+# sudo apt-get install ffmpeg python3-ws4py
+
+\end{verbatim}
+
+\vspace{-1.4cm}
+
+
