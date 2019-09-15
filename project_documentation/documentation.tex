@@ -40,7 +40,7 @@
 
 \usepackage[table,xcdraw]{xcolor} % Color de tabla
 
-%\usepackage{movie15}
+\usepackage{lscape} % Para poder poner en horizontal una página
 
 % Para símbolos de comprobación y x.
 \usepackage{pifont}% http://ctan.org/pkg/pifont
@@ -48,6 +48,7 @@
 \newcommand{\xmark}{ \color{red}\ding{55}}%
 
 \usepackage{eurosym} % Para símbolo €
+\usepackage{amsmath} % Para símbolo € en fórmulas
 
 % Paquetes para tree. Gráfico jerárquico
 \usepackage{tikz}
@@ -74,10 +75,9 @@
 \usepackage[spanish]{babel}
 \usepackage{appendix}
 
-\addto\captionsspanish{%
-  \renewcommand\appendixname{Anexo}
-  \renewcommand\appendixpagename{Anexos}
-}
+\renewcommand{\appendixname}{Anexos}
+\renewcommand{\appendixtocname}{Anexos}
+\renewcommand{\appendixpagename}{Anexos}
 
 
 \usepackage{float} % para controlar la situación de los entornos flotantes
@@ -110,7 +110,7 @@
 
 \begin{document}
 
-\thispagestyle{empty}
+\pagestyle{empty}
 
 \input{src/portada}
 
@@ -143,6 +143,14 @@
 \newpage
 
 \input{src/5.0_descripcion_aplicacion}
+
+\newpage
+
+\input{src/6_presupuesto}
+
+\newpage
+
+\input{src/7_conclusion}
 
 \newpage
 

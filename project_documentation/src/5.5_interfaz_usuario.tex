@@ -1,7 +1,7 @@
 
 
 \fancypagestyle{miEstilo505}{
-   \lhead{5.5 Interfaz de usuarion}
+   \lhead{5.5 Interfaz de usuario}
    \rhead{Página \thepage}
    \lfoot{}
    \cfoot{}
@@ -12,15 +12,20 @@
 
 \subsection{Interfaz de usuario}
 
-Para facilitar la interacción del usuario con la aplicación y mejorar su experiencia de usuario, se ha realizado un diseño de interfaz mediante botones e iconos (interfaz soportada por la API de telegram) utilizando los llamados 'Callback buttons` \cite{refx1}. Cuando un usuario pulsa estos botones, no se envía ningún mensaje al chat, sino que en su lugar el bot recibe una consulta que es manejada y respondida con una acción.
+Para facilitar la interacción del usuario con la aplicación y mejorar su experiencia de usuario, se ha realizado un diseño de interfaz mediante botones e iconos (interfaz soportada por la API de Telegram) utilizando los llamados 'Callback buttons` \cite{refx1}. Cuando un usuario pulsa estos botones, no se envía ningún mensaje al chat, sino que en su lugar el bot recibe una consulta que es manejada y respondida con una acción.
 
 El diseño propuesto se basa en un modelo jerárquico, donde podremos ir realizando una navegación entre menús partiendo del menú principal.
 
 Este diseño es el siguiente:
 
-\textbf{AQUÍ VA EL DISEÑO DE LA INTERFAZ DE USUARIO} 
-
 \newpage
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{images/55}
+	\caption{Diseño de la estructura de la interfaz}
+\end{figure}
 
 Su implementación se basa en realizar un menú con un conjunto de botones con los que poder navegar. Por ejemplo, la siguiente figura muestra el menú principal, donde se puede acceder al conjunto de funcionalidades de la aplicación.
 
@@ -30,7 +35,7 @@ Su implementación se basa en realizar un menú con un conjunto de botones con l
 	\caption{Menú principal de la aplicación}
 \end{figure}
 
-En la sección de \textit{Mode} se podrá acceder al conjunto de acciones relacionados modos de uso de la aplicación, en \textit{Configuration} se podrá acceder al conjunto de opciones para configurar la cámara \ldots
+En la sección de \textit{Mode} se podrá acceder al conjunto de acciones relacionadas con los modos de uso de la aplicación, en \textit{Configuration} se podrá acceder al conjunto de opciones para configurar la cámara \ldots
 Por ejemplo, si pulsamos el botón de \textit{Mode} se podrá acceder al conjunto de funcionalidades relacionadas.
 
 \begin{figure}[h]
@@ -45,10 +50,9 @@ La implementación de esta interfaz se puede comprobar en este \href{https://git
 	
 	\hline
 	
-	\textit{ \textbf{*Nota:} Para más información, todo este conjunto de botones y funcionalidades serán explicados en la guía de usuario de la sección X. }
+	\textit{ \textbf{*Nota:} Para más información, todo este conjunto de botones y funcionalidades serán explicados en la guía de usuario de la sección \ref{anex:guia}. }
 	\\
 	\hline
 	
 \end{tabular}
 
-\newpage

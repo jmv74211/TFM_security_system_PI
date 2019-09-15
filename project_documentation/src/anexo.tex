@@ -1,6 +1,5 @@
 \fancypagestyle{miEstiloA}{
    \lhead{Anexo}
-   %\chead{1. Introducción}
    \rhead{Página \thepage}
    \lfoot{}
    \cfoot{}
@@ -10,11 +9,21 @@
 \pagestyle{miEstiloA}
 
 
+%\section*{ANEXO}
+
 \begin{appendices}
 
+\appendix
+\clearpage
+\addappheadtotoc
+\appendixpage
 
 \input{src/anexo_hardware}
 
 \input{src/anexo_instalacion}
+
+\newpage
+
+\input{src/anexo_guia_usuario}
 
 \end{appendices}

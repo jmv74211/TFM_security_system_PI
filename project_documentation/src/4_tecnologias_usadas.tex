@@ -52,7 +52,7 @@ Los sistemas de control de versiones \cite{ref9} son programas que tienen como o
 
 El control de versiones es una de las tareas fundamentales para la administración de un proyecto de desarrollo de software en general. Surge de la necesidad de mantener y llevar control del código que vamos programando, conservando sus distintos estados. Es absolutamente necesario para el trabajo en equipo, pero resulta útil incluso a desarrolladores independientes. 
 
-Por este motivo, no he dudado en utilizar un sistema de control de versiones. El sistema control de versiones me ha facilitado mucho la gestión y seguimiento del proyecto. El sitema que he utilizado ha sido \texttt{git}, y como medio de alojamiento para este proyecto he utilizado  \texttt{github}.
+Por este motivo, no he dudado en utilizar un sistema de control de versiones. El sistema de control de versiones me ha facilitado mucho la gestión y seguimiento del proyecto. El sitema que he utilizado ha sido \texttt{git}, y como medio de alojamiento para este proyecto he utilizado  \texttt{Github}.
 
 \textbf{Git}
 
@@ -69,7 +69,7 @@ Para este proyecto, se ha creado un repositorio donde se ha almacenado todo el c
 
 \texttt{Github} \cite{ref11} es un servicio para alojamiento de repositorios de software gestionados por el sistema de control de versiones \texttt{Git}. En definitiva, \texttt{Github} es un sitio web pensado para hacer posible el compartir el código de una manera más fácil y al mismo tiempo darle popularidad a la herramienta de control de versiones en sí, que es \texttt{Git}.
 
-Este proyecto se ha ido alojando en el repositorio de github \url{https://github.com/jmv74211/TFM_security_system_PI}.
+Este proyecto se ha ido alojando en el repositorio de Github \url{https://github.com/jmv74211/TFM_security_system_PI}.
 
 \begin{figure}[h]
 	\centering
@@ -86,7 +86,7 @@ A continuación se muestran los lenguajes de programación utilizados.
 
 \texttt{Python} es un lenguaje de programación interpretado, de alto nivel y de propósito general. Este lenguaje de programación viene instalado predeterminadamente en casi todos los sistemas operativos, y consta de un gran número de bibliotecas para realizar una gran cantidad de tareas.
 
-\texttt{Python} se ha utilizado como lenguaje de programación base, con aproximadamente un 90\% del código fuente total. Básicamente he elegido este lenguaje ya que tiene Raspberry PI posee bibliotecas para interaccionar con \texttt{Python}, y con el resto de componentes involucrados.
+\texttt{Python} se ha utilizado como lenguaje de programación base, con aproximadamente un 90\% del código fuente total. Básicamente he elegido este lenguaje ya que Raspberry PI posee bibliotecas para interaccionar con \texttt{Python}, y con el resto de componentes involucrados.
 
 \begin{figure}[h]
 	\centering
@@ -139,9 +139,9 @@ Esta biblioteca ha sido utilizada en los módulos que interactúan directamente 
 
 \textbf{pyTelegramBotAPI}
 
-\texttt{pyTelegramBotAPI} \cite{ref13} es una biblioteca de funciones de alto nivel que hace uso de la API de telegram.
+\texttt{pyTelegramBotAPI} \cite{ref13} es una biblioteca de funciones de alto nivel que hace uso de la API de Telegram.
 
-En este proyecto se ha utilizado para crear el bot de telegram, que será la aplicación con la que el usuario interaccionará, y éste a su vez con la API desarrollada en la aplicación backend.
+En este proyecto se ha utilizado para crear el bot de Telegram, que será la aplicación con la que el usuario interaccionará, y éste a su vez con la API desarrollada en la aplicación backend.
 
 \begin{figure}[h]
 	\centering
@@ -150,7 +150,7 @@ En este proyecto se ha utilizado para crear el bot de telegram, que será la apl
 
 \textbf{Flask}
 
-\texttt{Flask} \cite{ref14} es un framework ligero de aplicaciones web WSGI. Está diseñado para hacer que que el despliegue de una aplicación sea rápida y fácil, con la capacidad de escalar a aplicaciones complejas.
+\texttt{Flask} \cite{ref14} es un framework ligero de aplicaciones web WSGI. Está diseñado para hacer que el despliegue de una aplicación sea rápida y fácil, con la capacidad de escalar a aplicaciones complejas.
 
 En este proyecto se ha utilizado para implementar varios servicios web, como la API principal que interactúa con el resto de módulos y componentes.
 
@@ -163,7 +163,7 @@ En este proyecto se ha utilizado para implementar varios servicios web, como la 
 
 \texttt{Celery} \cite{ref15} es una implementación de una cola de tareas para aplicaciones web de \texttt{Python} que se utiliza para ejecutar tareas de forma asíncrona.
 
-En este proyecto se ha utilizado principalmente en la API y en el agente de movimiento. El objetivo es poder realizar peticiones, y que la API atienda al mayor número de ellas, devolviendo la respuesta tras la ejecución de las tareas, sin producir ningún tipo de espera entre las comunicaciones (Más información en la sección X).
+En este proyecto se ha utilizado principalmente en la API y en el agente de movimiento. El objetivo es poder realizar peticiones, y que la API atienda al mayor número de ellas, devolviendo la respuesta tras la ejecución de las tareas, sin producir ningún tipo de espera entre las comunicaciones (Más información en la sección \ref{sec:composer}).
 
 \vspace{-0.6cm}
 
@@ -191,7 +191,7 @@ En este proyecto es usado para recibir la señal del sensor de movimiento, de fo
 
 \texttt{Tensorflow}  es una plataforma de código abierto para aprendizaje automático. Cuenta con un ecosistema completo y flexible de herramientas, bibliotecas y recursos que permiten a los investigadores impulsar el estado del arte en machine learning y a los desarrolladores construir y desplegar fácilmente aplicaciones potenciadas por el machine learning.
 
-En este proyecto se ha utilizado para construir un agente que sea capaz de reconocer objetos en una foto utilizando un modelo ligero preentrenado (más información en la sección X).
+En este proyecto se ha utilizado para construir un agente que sea capaz de reconocer objetos en una foto utilizando un modelo ligero preentrenado (más información en la sección \ref{sec:composer}).
 
 \begin{figure}[h]
 	\centering
@@ -226,7 +226,7 @@ Para este proyecto se ha utilizado \texttt{LaTeX}, utilizando la distribución \
 
 \textbf{TeXstudio}
 
-\texttt{TeXstudio} \cite{ref21} es un entorno integrado para crear documentos LaTeX. El objetivo es hacer que escribir LaTeX sea lo más fácil y cómodo posible.
+\texttt{TeXstudio} \cite{ref21} es un entorno integrado para crear documentos LaTeX. El objetivo es conseguir que escribir LaTeX sea lo más fácil y cómodo posible.
 
 Para este proyecto se ha utilizado la versión \textit{2.12.14}.
 
@@ -237,13 +237,13 @@ Para este proyecto se ha utilizado la versión \textit{2.12.14}.
 
 \subsection{Entorno de desarrollo}
 
-El entonor de desarrollo ha sido un aspecto muy importante para la implementación del proyecto, ya que el código se está ejecutando en una Raspberry PI que tiene recursos muy limitados, y los editores o entornos que puede utilizar no son los más cómodos.
+El entorno de desarrollo ha sido un aspecto muy importante para la implementación del proyecto, ya que el código se está ejecutando en una Raspberry PI que tiene recursos muy limitados, y los editores o entornos que puede utilizar no son los más cómodos.
 
 Por este motivo, he estado investigando si se puede realizar un desarrollo de la aplicación vía remota. Leyendo foros, observé que el entorno de desarrollo \texttt{pycharm} tiene la opción de poder crear y desarrollar un proyecto vía SSH.
 
 \textbf{Pycharm}
 
-Pycharm \cite{ref22} es un entorno de desarrollo profesional de \texttt{Python}. Gracias a este entorno de desarrollo he podido gestionar el proyecto de forma local, ya que los cambios generados se han sincronizado y ejecutado en la Raspberry PI a través de SSH.
+Pycharm \cite{ref22} es un entorno de desarrollo profesional de \texttt{Python}. Gracias a dicho entorno de desarrollo he podido gestionar el proyecto de forma local, ya que los cambios generados se han sincronizado y ejecutado en la Raspberry PI a través de SSH.
 
 En este proyecto se ha utilizado la versión \textit{2019.1.3 Profesional edition}, licencia académica que he obtenido gracias a la UGR. 
 
@@ -270,7 +270,7 @@ En este proyecto ha sido utilizado para crear dos colas de procesos, utilizados 
 
 Los bots de Telegram \cite{ref24} son aplicaciones de terceros que se ejecutan dentro de Telegram. Los usuarios pueden interactuar con los bots enviándoles mensajes, comandos y peticiones. Se pueden controlar estos bots usando peticiones HTTPS a la API de bot de Telegram.
 
-En este proyecto se ha utilizado para crear un bot de telegram que interactúe con el usuario y con la aplicación backend desarrollada.
+En este proyecto se ha utilizado para crear un bot de Telegram que interactúe con el usuario y con la aplicación backend desarrollada.
 
 \begin{figure}[h]
 	\centering

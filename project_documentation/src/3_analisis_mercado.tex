@@ -15,7 +15,7 @@
 
 Antes de comenzar con el desarrollo del proyecto, se ha realizado un estudio de mercado para comprobar si hay algún tipo de sistema similar ya implementado, qué características tiene, y qué posibles diferencias habría con el que se tiene pensado implementar.
 
-Es cierto que la raspberry PI tiene infinidades de posibles aplicaciones, y que en la web se puede encontrar todo tipo de tutoriales e ideas para poder explotar al máximo su uso, pero ¿existirá algún tipo sistema de seguridad que sea funcional, fácil de instalar y utilizar?. Para responder a esta pregunta, se ha realizado una búsqueda intensiva en la web y youtube, ya que suelen ser los principales medios donde se publica este tipo de información.
+Es cierto que la raspberry PI tiene infinidades de posibles aplicaciones, y que en la web se puede encontrar todo tipo de tutoriales e ideas para poder explotar al máximo su uso, pero ¿existirá algún tipo de sistema de seguridad que sea funcional, fácil de instalar y utilizar?. Para responder a esta pregunta, se ha realizado una búsqueda intensiva en la web y youtube, ya que suelen ser los principales medios donde se publica este tipo de información.
 
 Investigando, se ha descubierto que hay múltiples páginas y vídeos que hacen referencia al uso de una raspberry PI con una cámara, y su posible aplicación para poder visualizar en tiempo real la grabación realizada por la cámara.
 
@@ -70,7 +70,7 @@ Entre sus principales características, podemos encontrar las siguientes:
 
 \subsection{Proyecto: Raspberry Pi As Low-cost HD Surveillance Camera}\label{sec:pj2}
 
-Este es un proyecto \cite{ref4} bastante simple y centrado en la vigilancia y basado en \texttt{Motion detection software} \cite{ref5}. Este es un software de código abierto y disponible en los repositorios de raspbian para poder monitorizar las señales de vídeo para varios tipos de cámaras (entre ellas la PiCamera).
+Este es un proyecto \cite{ref4} bastante simple y centrado en la vigilancia el cual está basado en \texttt{Motion detection software} \cite{ref5}. Este es un software de código abierto y disponible en los repositorios de raspbian para poder monitorizar las señales de vídeo para varios tipos de cámaras (entre ellas la PiCamera).
 
 Algunas de las características de este software son:
 
@@ -111,9 +111,9 @@ A continuación se proporciona una guía básica de instalación y configuració
 
 Este es un proyecto descrito en un vídeo de youtube \cite{ref6} que explica cómo construir un pequeño sistema de seguridad basado en la detección de movimiento, captura de una foto y envío de la foto capturada tras haberse activado la detección de movimiento.
 
-En este vídeo se explica qué componentes son necesarios, cómo conectarlos y se proporciona un script de Python que se encarga de la detección movimiento y envío de la imagen al correo gmail, utilizando librerías de Python como \textit{PiCamera} y \textit{smtplib}.
+En este vídeo se explica qué componentes son necesarios, cómo conectarlos y se proporciona un script de Python que se encarga de la detección de movimiento y envío de la imagen al correo gmail, utilizando librerías de Python como \textit{PiCamera} y \textit{smtplib}.
 
-Este proyecto no tiene complejidad alguna, ya que es muy simple y todo está explicado para cualquier usuario, y es un buen comienzo para empezar a investigar y probar el mundo de la videovigilancia basada en bajo coste.
+Este proyecto no tiene complejidad alguna, ya que es muy simple y todo está explicado para cualquier usuario, además de ser un buen comienzo para empezar a investigar y probar el mundo de la videovigilancia basada en bajo coste.
 
 \subsection{Conclusión}
 
@@ -136,7 +136,7 @@ En las siguientes secciones, se mostrará más en detalle qué funcionalidades t
 
 Observando la tabla \ref{table:1}, se puede comprobar como la aplicación propuesta cumple con la mayoría de las características del resto de proyectos actuales, y mejora en otros aspectos.
 
-Como aspecto a destacar, decir que el proyecto propuesto consta de una aplicación backend y una aplicación multiplataforma de usuario, además de ser fácil de usar y estar documentada. Estos aspectos principales aportan una gran versatilidad a este proyecto, siendo sin duda la mejor opción hasta el momento desarrollada en el ámbito de la videovigilancia de raspberry PI.
+Como aspecto a destacar, decir que el proyecto propuesto consta de una aplicación backend y una aplicación multiplataforma de usuario, además de ser fácil uso y estar documentada. Estos aspectos principales aportan una gran versatilidad a este proyecto, siendo sin duda la mejor opción hasta el momento desarrollada en el ámbito de la videovigilancia de raspberry PI.
 
 También, como trabajos futuros, se desea implementar la funcionalidad multicámara, haciendo posible la interacción con más de una cámara simultáneamente.
 
@@ -147,7 +147,7 @@ También, como trabajos futuros, se desea implementar la funcionalidad multicám
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 \rowcolor[HTML]{EFEFEF} 
- \textbf{ Proyectos} & \hyperref[sec:pj1]{Proyecto 1}  & \hyperref[sec:pj2]{Proyecto 2} & \hyperref[sec:pj3]{Proyecto 3} & Mi propuesta \\ \hline
+ \textbf{ Proyectos} & \hyperref[sec:pj1]{Proyecto 1}  & \hyperref[sec:pj2]{Proyecto 2} & \hyperref[sec:pj3]{Proyecto 3} & SIVIRA \\ \hline
 Captura de imagen & \cmark & \cmark  & \cmark & \cmark \\ \hline
 \rowcolor[HTML]{fcfcfc} 
 Grabación de vídeo & \cmark  & \cmark  & \xmark & \cmark \\ \hline

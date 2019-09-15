@@ -8,10 +8,12 @@
    \rfoot{}
 }
 
-\pagestyle{miEstilo506}
+
 
 
 \subsection{Descripción de archivos y directorios}
+
+\pagestyle{miEstilo506}
 
 La aplicación \texttt{SIVIRA} está compuesta por una serie de archivos y directorios que implementan y ejecutan el conjunto de servicios del sistema de videovigilancia.
 
@@ -23,18 +25,20 @@ Todos estos archivos y directorios están disponibles en el repositorio oficial 
 	\caption{Repositorio de Github del proyecto SIVIRA}
 \end{figure}
 
-A continuación, se explicará cómo se ha organizado todos estos archivos y directorios, junto con una breve descripción sobre el objetivo de cada uno.
+A continuación, se explicará cómo se han organizado todos estos archivos y directorios, junto con una breve descripción sobre el objetivo de cada uno.
+
+\newpage
 
 \textbf{Capturated\_files}
 
-Este directorio está destinado a almacenar el conjunto de archivos de imágenes y vídeo generados por el sistema de videovigilancia. Su estructura es la siguiente puede verse en la figura \ref{fig:tik1}.
+Este directorio está destinado a almacenar el conjunto de archivos de imágenes y vídeos generados por el sistema de videovigilancia. Su estructura puede verse en la figura \ref{fig:tik1}.
 
 Se compone de los siguientes elementos:
 
 \vspace{-0.5cm}
 
 \begin{itemize}
-\item \textbf{alerts}: Directorio donde se almacenan todos los archivos generados mediante alertas (capturas o grabaciones automáticos tras ser activado el sensor de movimiento).
+\item \textbf{alerts}: Directorio donde se almacenan todos los archivos generados mediante alertas (capturas o grabaciones automáticas tras ser activado el sensor de movimiento).
 
 	\begin{itemize}
 	\item \textbf{false\_positive}: Directorio donde serán almacenados todos los archivos generados tras ser activado el sensor de movimiento y que el agente detector de objetos ha filtrado tras comprobar que no hay ninguna persona en dichas fotos.
@@ -42,7 +46,7 @@ Se compone de los siguientes elementos:
 
 \item \textbf{photos}: Directorio donde se almacenan todas las fotos capturadas de forma manual.
 
-\item \textbf{videos}: Directorio donde se almacenan todas los vídeos capturados de forma manual.
+\item \textbf{videos}: Directorio donde se almacenan todos los vídeos capturados de forma manual.
 
 \item \textbf{Readme.md}: Archivo de documentación para el repositorio.
 
@@ -84,7 +88,7 @@ Se compone de los siguientes elementos:
 
 \textbf{Doc}
 
-Este directorio contiene una estructura de archivos de documentación en formato \texttt{.md} para que puedan ser consultados desde el repositorio de Github. Su estructura es la siguiente puede verse en la figura \ref{fig:tik2}.
+Este directorio contiene una estructura de archivos de documentación en formato \texttt{.md} para que puedan ser consultados desde el repositorio de Github. Su estructura puede verse en la figura \ref{fig:tik2}.
 
 \begin{figure}
 \centering
@@ -180,7 +184,7 @@ Se compone de los siguientes elementos:
 
 \item \textbf{app\_deployment}: Directorio que contiene documentación sobre cómo desplegar y ejecutar la aplicación.
 
-\item \textbf{backend\_app}: Directorio que contiene documentación el contenido del directorio \textit{src}.
+\item \textbf{backend\_app}: Directorio que contiene documentación sobre el contenido de  \textit{src}.
 
 \item \textbf{hardware}: Directorio que contiene documentación sobre el hardware necesario, cómo instalarlo y su presupuesto.
 
@@ -190,15 +194,17 @@ Se compone de los siguientes elementos:
 
 \item \textbf{test}: Directorio que contiene documentación sobre cómo ejecutar los tests de la aplicación.
 
-\item \textbf{user\_guide}: Directorio que contiene documentación sobre cómo utilizar las distintas funcionalidades de la aplicación a través de la interfaz del bot de telegram.
+\item \textbf{user\_guide}: Directorio que contiene documentación sobre cómo utilizar las distintas funcionalidades de la aplicación a través de la interfaz del bot de Telegram.
 
 \item \textbf{Readme.md}: Archivo que contiene el índice general sobre la distinta documentación disponible.
 
 \end{itemize}
 
+\newpage
+
 \textbf{Project documentation}
 
-Este directorio contiene el conjunto de archivos necesarios para generar la documentación del proyecto (este fichero pdf). Su estructura es la siguiente puede verse en la figura \ref{fig:tik3}.
+Este directorio contiene el conjunto de archivos necesarios para generar la documentación del proyecto (este fichero pdf). Su estructura puede verse en la figura \ref{fig:tik3}.
 
 \begin{figure}
 \centering
@@ -257,21 +263,21 @@ Se compone de los siguientes elementos:
 	\item \textbf{API\_agent.py}: Servicio que inicia la \texttt{API} principal de la aplicación.
 	\item \textbf{motion\_agent.py}: Servicio que inicia el reconocimiento de movimiento a través del sensor y genera alertas en la \texttt{API} principal.
 	\item \textbf{object\_detector\_agent.py}: Servicio que inicia una api secundaria para poder realizar el reconocimiento de objetos en una foto con el objetivo de poder filtrar las alertas generadas por el \texttt{motion\_agent}.
-	\item \textbf{telegram\_bot.py}: Servicio que inicia el bot de telegram que hace de intermediario entre la aplicación de telegram usada por el usuario y la \texttt{API} principal.
+	\item \textbf{telegram\_bot.py}: Servicio que inicia el bot de Telegram que hace de intermediario entre la aplicación de Telegram usada por el usuario y la \texttt{API} principal.
 	\end{itemize}
 
 \item \textbf{config}: Directorio donde se almacenan archivos de configuración modificados por el usuario y necesarios para configurar correctamente la aplicación. Estos son:
 
 	\begin{itemize}
 	\item \textbf{authentication.yml}: Archivo de configuración donde se introducen las credenciales utilizadas para poder comunicarse y enviar peticiones a la \texttt{API}.
-	\item \textbf{modules\_config.yml}: Archivo de configuración que contiene los parámetros por defecto para la cámara y grabación de vídeo (resolución, rotación \ldots) y que el usuario puede modificar a través del bot de telegram.
-	\item \textbf{telegram\_config.yml}: Archivo de configuración que contiene las credenciales de acceso necesarias para comunicarse con el bot de telegram y la \texttt{API} de la aplicación.
+	\item \textbf{modules\_config.yml}: Archivo de configuración que contiene los parámetros por defecto para la cámara y grabación de vídeo (resolución, rotación \ldots) y que el usuario puede modificar a través del bot de Telegram.
+	\item \textbf{telegram\_config.yml}: Archivo de configuración que contiene las credenciales de acceso necesarias para comunicarse con el bot de Telegram y la \texttt{API} de la aplicación.
 	\end{itemize}
 
 \item \textbf{lib}: Directorio donde se almacenan archivos que contienen funciones auxiliares a utilizar por los componentes de la aplicación. En este caso solo contiene un archivo, pero en versiones posteriores podrá contener más archivos.
 
 	\begin{itemize}
-	\item \textbf{flask\_celery.py}: Contiene funciones auxiliares para la configuración de la gestor de tareas \texttt{celery} \cite{ref15} en \texttt{Flask} \cite{ref14}.
+	\item \textbf{flask\_celery.py}: Contiene funciones auxiliares para la configuración del gestor de tareas \texttt{celery} \cite{ref15} en \texttt{Flask} \cite{ref14}.
 	\end{itemize}
 
 \item \textbf{modules}: Directorio donde se almacenan todos los archivos correspondientes a las implementaciones de los módulos que utilizarán el resto de servicios y \texttt{API} para conectarse con el recurso de la cámara, generar logs \ldots Estos módulos son:
@@ -282,14 +288,14 @@ Se compone de los siguientes elementos:
 		\begin{itemize}
 		\item \textbf{README.md}: Documentación del repositorio original que se ha usado y modificado para implementar este servicio.
 		\item \textbf{index.html}: Contiene la página web responsive donde se reproducirá la imagen de streaming.
-		\item \textbf{jsmpg.js}: Contiene el conjunto de funciona de Javascript que importa el servidor web de streaming.
+		\item \textbf{jsmpg.js}: Contiene el conjunto de funciones de Javascript que importa el servidor web de streaming.
 		\item \textbf{streaming\_server.py}: Contiene la implementación del servidor de streaming.
 		\end{itemize}
 		
 		\item \textbf{authentication.py}: Archivo que implementa el módulo de autenticación usado por la \texttt{API}.
 		\item \textbf{logger.py}: Archivo que implementa el módulo de logs que es usado por el resto de servicios de la aplicación.
 		\item \textbf{photo.py}: Fichero que implementa las funcionalidades necesarias para comunicarse el recurso hardware de la cámara para realizar fotos.
-		\item \textbf{video.py}: Fichero que implementa las funcionalidades necesarias para comunicarse el recurso hardware de la cámara para grabar vídeos.
+		\item \textbf{video.py}: Fichero que implementa las funcionalidades necesarias para comunicarse con el recurso hardware de la cámara para grabar vídeos.
 				
 	\end{itemize}
 
@@ -419,7 +425,7 @@ Se compone de los siguientes elementos:
 
 \textbf{Test}
 
-Este directorio contiene el conjunto de archivos necesarios para ejecutar los test unitarios e integración para probar el correcto funcionamiento de los módulos de la aplicación. Su estructura es la siguiente puede verse en la figura \ref{fig:tik5}.
+Este directorio contiene el conjunto de archivos necesarios para ejecutar los test unitarios y de integración para probar el correcto funcionamiento de los módulos de la aplicación. Su estructura puede verse en la figura \ref{fig:tik5}.
 
 Se compone de los siguientes elementos:
 
@@ -445,7 +451,7 @@ Se compone de los siguientes elementos:
 	\item \textbf{test\_photo.py}: Contiene el conjunto de tests para probar las funcionalidades del módulo Camera.
 	\end{itemize}
 
-\item \textbf{README.md}: Archivo que contiene documentación con ejemplos para poder ejecutar los test.
+\item \textbf{README.md}: Archivo que contiene documentación con ejemplos para poder ejecutar los tests.
 
 \begin{figure}[H]
 \centering
@@ -517,13 +523,13 @@ Archivo que contiene la página principal de la documentación de la aplicación
 
 \textbf{app.sh}
 
-Este archivo contiene un script \texttt{bash} que es el utilizado para iniciar y parar los procesos que ejecutan la aplicación. En la sección X se detalla más sobre cómo utilizar este script.
+Este archivo contiene un script \texttt{bash} que es el utilizado para iniciar y parar los procesos que ejecutan la aplicación. En la sección \ref{anex:desp} se detalla más sobre cómo utilizar este script.
 
 \textbf{full\_requirements.txt}
 
-Archivo que contiene las dependencias de Python necesarias para instalar todos los componentes y servicios necesarios por la aplicación.
+Archivo que contiene las dependencias de Python necesarias para instalar todos los componentes y servicios necesarios para la aplicación.
 
 \textbf{minimum\_requirements.txt}
 
-Archivo que contiene las dependencias básicas de Python para realizar una instalación mínima de los componentes y servicios necesarios por la aplicación.
+Archivo que contiene las dependencias básicas de Python para realizar una instalación mínima de los componentes y servicios necesarios para la aplicación.
 
