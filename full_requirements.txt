@@ -9,4 +9,4 @@ celery==4.3.0
 requests==2.21.0
 numpy==1.16.4
 opencv-python==3.4.4.19
-tensorflow==1.14.0
+tensorflow==2.5.1
